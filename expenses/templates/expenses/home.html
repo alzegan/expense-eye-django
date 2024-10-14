@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="vieport" content="width=device-width, initial-scale=1.0">
+    <title>ExpenseEye - Twój asystent kontroli wydatków</title>
+</head>
+<body>
+    <h1>Witaj w ExpenseEye</h1>
+    <p>Twój osobisty asystent do kontroli wydatków</p>
+    <nav>
+        <ul>
+            <li><a href="{% url 'expense_list' %}">Lista wydatków</a></li>
+            <li><a href="{% url 'add_expense' %}">Dodaj nowy wydatek</a></li>
+        </ul>
+    </nav>
+
+</body>
+</html>

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="vieport" content="width=device-width, initial-scale=1.0">
+    <title>Lista wydatków</title>
+</head>
+<body>
+    <h1>Lista wydatków</h1>
+    <ul>
+        {% for expenses in expenses %}
+            <li>{{ expenses.amount }} - {{ expenses.category }} - {{ expenses.date }}</li>
+        {% empty %}
+            <li>Brak wydatków do wyświetlenia.</li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'add_expense' %}">Dodaj nowy wydatek</a><br>
+    <a href="{% url 'home' %}">Powrót do strony głównej</a>
+
+</body>
+</html>
