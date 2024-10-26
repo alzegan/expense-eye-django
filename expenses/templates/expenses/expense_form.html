@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="container">
+    <h1>{% if from.instance.pk %}Edytuj wydatek{% else %}Dodaj nowy wydatek{% endif %}</h1>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn">Zapisz</button>
+        </form>
+        <a href="{% url 'expense_list' %} class="btn">Powrót do listy</a>
+    </div>
+{% endblock %}

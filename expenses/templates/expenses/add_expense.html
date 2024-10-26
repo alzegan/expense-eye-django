@@ -1,18 +1,14 @@
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="vieport" content="width=device-width, initial-scale=1.0">
-    <title>Dodaj wydatek</title>
-</head>
-<body>
-    <h1>Dodaj wydatek</h1>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <h1>Dodaj nowy wydatek</h1>
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit"></button>
+        <button type="submit" class="btn"></button>
     </form>
-    <a href="{% url 'expense_list' %}">Powrót do listy</a>
-
-</body>
-</html>
+    <a href="{% url 'expense_list' %}" class="btn">Anuluj</a>
+</div>
+{% endblock %}

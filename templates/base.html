@@ -1,0 +1,33 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ExpenseEye - Kontrola wydatków{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <header>
+        {% if user.is_authenticated and request.path != '/' %}
+        <div class="container">
+            <nav>
+                <a href="{% url 'expense_list' %}">Lista wydatków</a>
+                <a href="{% url 'add_expense' %}">Dodaj wydatek</a>
+                <a href="{% url 'logout' %}">Wyloguj</a>
+            </nav>
+        </div>
+        {% endif %}
+    </header>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer>
+        <p>&copy; {% now 'Y' %} ExpenseEye</p>
+    </footer>
+
+</body>
+</html>
