@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="layout">
+    <aside class="sidebar">
+        <div class="logo">
+            <i data-lucide="eye-closed"></i> ExpenseEye
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="{% url 'dashboard' %}" class="nav-item active">
+                <i data-lucide="home"></i>
+                Panel główny
+            </a>
+            <a href="{% url 'overview' %}" class="nav-item">
+                <i data-lucide="search"></i>
+                Przegląd
+            </a>
+            <a href="{% url 'budget' %}" class="nav-item">
+                <i data-lucide="wallet"></i>
+                Budżet
+            </a>
+            <a href="{% url 'goals' %}" class="nav-item">
+                <i data-lucide="star"></i>
+                Cele
+            </a>
+            <a href="{% url 'reports' %}" class="nav-item">
+                <i data-lucide="chart-column"></i>
+                Raporty
+            </a>
+        </nav>
+
+        <div>
+            <a href="{% url 'settings' %}" class="nav-item logout">
+                <i data-lucide=wrench></i>
+                Ustawienia
+            </a>
+            <a href="{% url 'login' %}" class="nav-item logout">
+                <i data-lucide=log-out></i>
+                Wyloguj
+            </a>
+
+        </div>
+
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="dashboard">
+            <div class="dashboard-grid">
+                <!-- Twoje istniejące karty -->
+                <div class="dashboard-card summary-card">
+                    <h2>Wydatki w {{ current_month }}</h2>
+                    <div class="amount">
+                        {{ total_month|floatformat:2 }} zł
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <h2>Ostatnie wydatki</h2>
+                    <div class="recent-expenses">
+                        {% for expense in recent_expenses %}
+                        <div class="expense-item">
+                            <div class="expense-date">{{ expense.date }}</div>
+                            <div class="expense-category">{{ expense.category.name }}</div>
+                            <div class="expense-amount">{{ expense.amount }} zł</div>
+                        </div>
+                        {% empty %}
+                        <p>Brak wydatków do wyświetlenia</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <h2>Wydatki według kategorii</h2>
+                    <div class="category-expenses">
+                        {% for category in expenses_by_category %}
+                        <div class="category-item">
+                            <span class="category-name">{{ category.category__name }}</span>
+                            <span class="category-amount">{{ category.total|floatformat:2 }} zł</span>
+                        </div>
+                        {% empty %}
+                        <p>Brak wydatków do wyświetlenia</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-actions">
+                <a href="{% url 'add_expense' %}" class="btn btn-primary">Dodaj nowy wydatek</a>
+                <a href="{% url 'expense_list' %}" class="btn">Zobacz wszystkie wydatki</a>
+            </div>
+        </div>
+    </main>
+</div>
+
+{% endblock %}

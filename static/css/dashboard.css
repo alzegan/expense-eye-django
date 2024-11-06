@@ -1,0 +1,235 @@
+.layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+     width: 260px;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    padding: 24px 16px;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid rgba(255, 255, 255, 0.3);
+    height: 100vh;
+}
+
+.sidebar-header {
+    padding: 0 12px;
+    margin-bottom: 24px;
+}
+
+.sidebar-footer {
+    margin-top: auto;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.logo {
+    font-size: 20px;
+    font-weight: 500;
+    color: #2f4151;
+    margin-bottom: 24px;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    color: #2f4151;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    gap: 12px;
+}
+
+.nav-item:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.nav-item.active {
+    background: rgba(47, 65, 81, 0.9);
+    color: white;
+}
+
+.nav-icon {
+    width: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-item.logout {
+    margin-top: auto;
+    border-top: 0px;
+    margin-top: 20px;
+    padding-top: 20px;
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    padding: 24px;
+}
+
+/* Dashboard */
+.dashboard {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.dashboard-card {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+    transition: all 0.3s ease;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 36px rgba(31, 38, 135, 0.2);
+}
+
+.dashboard-card h2 {
+    color: #2f4151;
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    padding-bottom: 10px;
+}
+
+.amount {
+    font-size: 36px;
+    font-weight: 600;
+    color: #2f4151;
+    margin-top: 10px;
+}
+
+.expense-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.expense-item:last-child {
+    border-bottom: none;
+}
+
+.expense-date {
+    color: #2f4151;
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+.expense-category {
+    color: #2f4151;
+    font-weight: 500;
+}
+
+.expense-amount {
+    color: #2f4151;
+    font-weight: 600;
+}
+
+.category-expenses {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.category-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.category-item:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateX(5px);
+}
+
+.category-name {
+    color: #2f4151;
+    font-weight: 500;
+}
+
+.category-amount {
+    color: #2f4151;
+    font-weight: 600;
+}
+
+.dashboard-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.dashboard-actions a {
+    padding: 12px 20px;
+    background: rgba(47, 65, 81, 0.9);
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.3s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-actions a:hover {
+    background: #567C8D;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.dashboard-card p {
+    color: #2f4151;
+    text-align: center;
+    padding: 20px 0;
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px;
+    font-size: 20px;
+    font-weight: 500;
+    color: #2f4151;
+    margin-bottom: 24px;
+}
+
+.logo i {
+    width: 20px;
+    height: 20px;
+    stroke-width: 1.5;
+    color: #2f4151;
+}
