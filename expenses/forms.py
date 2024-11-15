@@ -2,6 +2,8 @@ from django import forms
 from .models import Expense, Category
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from django.utils import timezone
+
 
 class UserRegistrationForm(UserCreationForm):
     email = forms.EmailField(required=True)
@@ -34,10 +36,38 @@ class UserRegistrationForm(UserCreationForm):
 class ExpenseForm(forms.ModelForm):
     class Meta:
         model = Expense
-        fields = ['amount', 'date', 'description', 'category']
+        fields = ['amount', 'date', 'category', 'description', 'payment_method']
         widgets = {
-            'date': forms.DateInput(attrs={'type': 'date'}),
+            'amount': forms.NumberInput(attrs={
+                'class': 'form-input',
+                'step': '0.01',
+                'min': '0',
+                'placeholder': '0.00'
+            }),
+            'date': forms.DateInput(attrs={
+                'class': 'form-input',
+                'type': 'date',
+                'value': timezone.now().strftime('%Y-%m-%d')  # Format RRRR-MM-DD
+            }),
+            'category': forms.Select(attrs={
+                'class': 'form-input'
+            }),
+            'payment_method': forms.Select(attrs={
+                'class': 'form-input'
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'form-input',
+                'rows': 3,
+                'placeholder': 'Opisz wydatek...'
+            })
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['date'].input_formats = ['%Y-%m-%d']
+        self.fields['date'].initial = timezone.now().strftime('%Y-%m-%d')
+        self.fields['description'].required = False
+
 
 class CategoryForm(forms.ModelForm):
     class Meta:

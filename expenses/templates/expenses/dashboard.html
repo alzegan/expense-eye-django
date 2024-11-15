@@ -13,13 +13,13 @@
                 <i data-lucide="home"></i>
                 Panel główny
             </a>
+            <a href="{% url 'budget' %}" class="nav-item">
+                <i data-lucide="wallet"></i>
+                Dodaj wydatek
+            </a>
             <a href="{% url 'overview' %}" class="nav-item">
                 <i data-lucide="search"></i>
                 Przegląd
-            </a>
-            <a href="{% url 'budget' %}" class="nav-item">
-                <i data-lucide="wallet"></i>
-                Budżet
             </a>
             <a href="{% url 'goals' %}" class="nav-item">
                 <i data-lucide="star"></i>
@@ -45,11 +45,9 @@
 
     </aside>
 
-    <!-- Main Content -->
     <main class="main-content">
         <div class="dashboard">
             <div class="dashboard-grid">
-                <!-- Twoje istniejące karty -->
                 <div class="dashboard-card summary-card">
                     <h2>Wydatki w {{ current_month }}</h2>
                     <div class="amount">
@@ -86,11 +84,7 @@
                     </div>
                 </div>
             </div>
-
-            <div class="dashboard-actions">
-                <a href="{% url 'add_expense' %}" class="btn btn-primary">Dodaj nowy wydatek</a>
-                <a href="{% url 'expense_list' %}" class="btn">Zobacz wszystkie wydatki</a>
-            </div>
+        
         </div>
     </main>
 </div>

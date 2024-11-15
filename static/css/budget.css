@@ -1,0 +1,134 @@
+.form-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.form-card {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 40px;
+    width: 100%;
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+}
+
+.card-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.card-header h2 {
+    color: #2f4151;
+    font-size: 24px;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+.quick-tips {
+    color: #2f4151;
+    font-size: 14px;
+    opacity: 0.7;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    color: #2f4151;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px 15px;
+    background: rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    font-size: 14px;
+    color: #2f4151;
+    outline: none;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: #2f4151;
+    box-shadow: 0 0 0 2px rgba(47, 65, 81, 0.1);
+}
+
+textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 30px;
+}
+
+.submit-button,
+.secondary-button {
+    flex: 1;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.submit-button {
+    background: #2f4151;
+    color: white;
+    border: none;
+}
+
+.submit-button:hover {
+    background: #567C8D;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.secondary-button {
+    background: transparent;
+    color: #2f4151;
+    border: 1px solid #2f4151;
+}
+
+.secondary-button:hover {
+    background: rgba(47, 65, 81, 0.1);
+    transform: translateY(-1px);
+}
+
+/* Responsywność */
+@media (max-width: 768px) {
+    .form-card {
+        padding: 20px;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .submit-button,
+    .secondary-button {
+        width: 100%;
+    }
+}
+
+body {
+    background-color: red !important;
+}
