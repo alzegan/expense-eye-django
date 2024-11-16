@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="form-container">
+    <div class="form-card">
+        <div class="card-header">
+            <h2>Usuń wydatek</h2>
+            <div class="quick-tips">
+                Wybierz wydatek, który chcesz usunąć z systemu
+            </div>
+        </div>
+
+        <div class="expense-list">
+            {% for expense in expenses %}
+                <div class="expense-item">
+                    <div class="expense-details">
+                        <span class="expense-date">{{ expense.date }}</span>
+                        <span class="expense-category">{{ expense.category.name }}</span>
+                        <span class="expense-amount">{{ expense.amount }} zł</span>
+                        {% if expense.description %}
+                            <span class="expense-description">{{ expense.description }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="expense-actions">
+                        <button class="delete-btn" onclick="confirmDelete({{ expense.id }})">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            {% empty %}
+                <p class="no-expenses">Brak wydatków do wyświetlenia</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal do potwierdzenia usunięcia -->
+<div id="deleteModal" class="modal">
+    <div class="modal-content">
+        <div class="card-header">
+            <h2>Potwierdzenie usunięcia</h2>
+            <p>Czy na pewno chcesz usunąć ten wydatek?</p>
+        </div>
+        <div class="modal-actions">
+            <button onclick="deleteExpense()" class="submit-button">Tak, usuń</button>
+            <button onclick="closeModal()" class="secondary-button">Anuluj</button>
+        </div>
+    </div>
+</div>
+
+<script>
+let expenseToDelete = null;
+
+function confirmDelete(expenseId) {
+    expenseToDelete = expenseId;
+    document.getElementById('deleteModal').style.display = 'block';
+}
+
+function closeModal() {
+    document.getElementById('deleteModal').style.display = 'none';
+}
+
+function deleteExpense() {
+    if (expenseToDelete) {
+        fetch(`/budget/delete/${expenseToDelete}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        });
+    }
+    closeModal();
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+
+{% endblock %}

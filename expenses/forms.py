@@ -34,6 +34,14 @@ class UserRegistrationForm(UserCreationForm):
 
 
 class ExpenseForm(forms.ModelForm):
+    new_category = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-input',
+            'placeholder': 'Wpisz nazwę nowej kategorii'
+        })
+    )
+
     class Meta:
         model = Expense
         fields = ['amount', 'date', 'category', 'description', 'payment_method']
@@ -46,14 +54,19 @@ class ExpenseForm(forms.ModelForm):
             }),
             'date': forms.DateInput(attrs={
                 'class': 'form-input',
-                'type': 'date',
-                'value': timezone.now().strftime('%Y-%m-%d')  # Format RRRR-MM-DD
+                'type': 'date'
             }),
             'category': forms.Select(attrs={
                 'class': 'form-input'
             }),
             'payment_method': forms.Select(attrs={
-                'class': 'form-input'
+                'class': 'form-input',
+                'choices': [
+                    ('cash', 'Gotówka'),
+                    ('card', 'Karta'),
+                    ('transfer', 'Przelew'),
+                    ('other', 'Inne')
+                ]
             }),
             'description': forms.Textarea(attrs={
                 'class': 'form-input',
@@ -64,9 +77,18 @@ class ExpenseForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        categories = Category.objects.all().order_by('name')  # Dodano order_by
+        self.fields['category'].choices = [('', '--------')] + [(c.id, c.name) for c in categories] + [('new', 'Dodaj inną kategorię...')]
         self.fields['date'].input_formats = ['%Y-%m-%d']
         self.fields['date'].initial = timezone.now().strftime('%Y-%m-%d')
         self.fields['description'].required = False
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if cleaned_data.get('category') == 'new':
+            if not self.data.get('new_category'):
+                raise forms.ValidationError("Proszę podać nazwę nowej kategorii")
+        return cleaned_data
 
 
 class CategoryForm(forms.ModelForm):

@@ -3,9 +3,10 @@
 {% block content %}
 
 <div class="layout">
-    <aside class="sidebar">
+    <div class="sidebar">
         <div class="logo">
-            <i data-lucide="eye-closed"></i> ExpenseEye
+            <i data-lucide="eye-closed"></i>
+            ExpenseEye
         </div>
 
         <nav class="sidebar-nav">
@@ -15,37 +16,35 @@
             </a>
             <a href="{% url 'budget' %}" class="nav-item">
                 <i data-lucide="wallet"></i>
-                Dodaj wydatek
+                Zarządzaj wydatkami
             </a>
             <a href="{% url 'overview' %}" class="nav-item">
                 <i data-lucide="search"></i>
-                Przegląd
+                Szukaj
             </a>
             <a href="{% url 'goals' %}" class="nav-item">
-                <i data-lucide="star"></i>
+                <i data-lucide="target"></i>
                 Cele
             </a>
             <a href="{% url 'reports' %}" class="nav-item">
                 <i data-lucide="chart-column"></i>
                 Raporty
             </a>
+
+            <div class="sidebar-footer">
+                <a href="{% url 'settings' %}" class="nav-item logout">
+                    <i data-lucide="settings"></i>
+                    Ustawienia
+                </a>
+                <a href="{% url 'login' %}" class="nav-item logout">
+                    <i data-lucide="log-out"></i>
+                    Wyloguj
+                </a>
+            </div>
         </nav>
+    </div>
 
-        <div>
-            <a href="{% url 'settings' %}" class="nav-item logout">
-                <i data-lucide=wrench></i>
-                Ustawienia
-            </a>
-            <a href="{% url 'login' %}" class="nav-item logout">
-                <i data-lucide=log-out></i>
-                Wyloguj
-            </a>
-
-        </div>
-
-    </aside>
-
-    <main class="main-content">
+    <main class="main-content" role="main">
         <div class="dashboard">
             <div class="dashboard-grid">
                 <div class="dashboard-card summary-card">
@@ -59,13 +58,13 @@
                     <h2>Ostatnie wydatki</h2>
                     <div class="recent-expenses">
                         {% for expense in recent_expenses %}
-                        <div class="expense-item">
-                            <div class="expense-date">{{ expense.date }}</div>
-                            <div class="expense-category">{{ expense.category.name }}</div>
-                            <div class="expense-amount">{{ expense.amount }} zł</div>
-                        </div>
+                            <div class="expense-item">
+                                <span class="expense-date">{{ expense.date }}</span>
+                                <span class="expense-category">{{ expense.category.name }}</span>
+                                <span class="expense-amount">{{ expense.amount|floatformat:2 }} zł</span>
+                            </div>
                         {% empty %}
-                        <p>Brak wydatków do wyświetlenia</p>
+                            <p>Brak wydatków do wyświetlenia</p>
                         {% endfor %}
                     </div>
                 </div>
@@ -74,19 +73,23 @@
                     <h2>Wydatki według kategorii</h2>
                     <div class="category-expenses">
                         {% for category in expenses_by_category %}
-                        <div class="category-item">
-                            <span class="category-name">{{ category.category__name }}</span>
-                            <span class="category-amount">{{ category.total|floatformat:2 }} zł</span>
-                        </div>
+                            <div class="category-item">
+                                <span class="category-name">{{ category.category__name }}</span>
+                                <span class="category-amount">{{ category.total|floatformat:2 }} zł</span>
+                            </div>
                         {% empty %}
-                        <p>Brak wydatków do wyświetlenia</p>
+                            <p>Brak wydatków do wyświetlenia</p>
                         {% endfor %}
                     </div>
                 </div>
             </div>
-        
         </div>
     </main>
 </div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>
+    lucide.createIcons();
+</script>
 
 {% endblock %}

@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="form-container">
+    <div class="form-card">
+        <div class="card-header">
+            <h2>Modyfikuj wydatek</h2>
+            <div class="quick-tips">
+                Wybierz wydatek, który chcesz zmodyfikować
+            </div>
+        </div>
+
+        <div class="expense-list">
+            {% for expense in expenses %}
+                <div class="expense-item">
+                    <div class="expense-details">
+                        <span class="expense-date">{{ expense.date }}</span>
+                        <span class="expense-category">{{ expense.category.name }}</span>
+                        <span class="expense-amount">{{ expense.amount }} zł</span>
+                        {% if expense.description %}
+                            <span class="expense-description">{{ expense.description }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="expense-actions">
+                        <button class="edit-btn" onclick="openEditForm({{ expense.id }})">
+                            <i class="fas fa-pencil-alt"></i>
+                        </button>
+                    </div>
+                </div>
+            {% empty %}
+                <p class="no-expenses">Brak wydatków do wyświetlenia</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal do edycji wydatku -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <div class="card-header">
+            <h2>Edytuj wydatek</h2>
+        </div>
+        
+        <form id="editForm" method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Kwota (zł)</label>
+                <input type="number" name="amount" step="0.01" class="form-input" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Data</label>
+                <input type="date" name="date" class="form-input" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Kategoria</label>
+                <select name="category" class="form-input" required>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}">{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Metoda płatności</label>
+                <select name="payment_method" class="form-input" required>
+                    <option value="cash">Gotówka</option>
+                    <option value="card">Karta</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Opis (opcjonalnie)</label>
+                <textarea name="description" class="form-input"></textarea>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="submit-button">Zapisz zmiany</button>
+                <button type="button" onclick="closeEditModal()" class="secondary-button">Anuluj</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openEditForm(expenseId) {
+    fetch(`/budget/get-expense/${expenseId}/`)
+        .then(response => response.json())
+        .then(data => {
+            const form = document.getElementById('editForm');
+            form.elements['amount'].value = data.amount;
+            form.elements['date'].value = data.date;
+            form.elements['category'].value = data.category;
+            form.elements['payment_method'].value = data.payment_method;
+            form.elements['description'].value = data.description;
+            form.action = `/budget/modify/${expenseId}/`;
+            document.getElementById('editModal').style.display = 'block';
+        });
+}
+
+function closeEditModal() {
+    document.getElementById('editModal').style.display = 'none';
+}
+</script>
+
+{% endblock %}

@@ -5,19 +5,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ExpenseEye - Kontrola wydatków</title>
+
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="{% static 'css/budget.css' %}">
 
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 
     {% block content %}{% endblock %}
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
             lucide.createIcons();
-        });
     </script>
 
 </body>

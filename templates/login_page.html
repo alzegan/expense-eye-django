@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="main-content">
+    <div class="welcome-text">
+        <div class="welcome-intro">Witaj w aplikacji do kontroli wydatków</div>
+        <div class="welcome-brand">ExpenseEye</div>
+        <div class="welcome-desc">Zarządzaj swoimi wydatkami w prosty i efektywny sposób</div>
+    </div>
+
+    <div class="login-wrapper">
+        <div class="login-header">
+            Logowanie
+        </div>
+
+        <form method="post" action="{% url 'login' %}">
+            {% csrf_token %}
+            <input type="text" name="username" placeholder="Nazwa użytkownika" class="input-field" required>
+
+            <div class="password-wrapper">
+                <input type="password" name="password" placeholder="Hasło" class="input-field" id="password-field">
+                <span class="password-toggle" onclick="togglePassword()" id="toggle-text">
+                    Pokaż
+                </span>
+            </div>
+
+            <div class="login-options">
+                <div class="remember">
+                    <input type="checkbox" id="remember-me">
+                    <label for="remember-me">Zapamiętaj mnie</label>
+                    <a href="#">Zapomniałeś hasła?</a>
+                </div>
+            </div>
+
+            <button type="submit" class="login-btn">Zaloguj</button>
+        </form>
+
+        <div class="register-link">
+            Nie masz jeszcze konta? <a href="{% url 'register' %}" id="show-register">Zarejestruj się tutaj</a>
+        </div>
+    </div>
+
+<script>
+function togglePassword() {
+    const passwordField = document.getElementById('password-field');
+    const toggleText = document.getElementById('toggle-text');
+
+    if (passwordField.type === 'password') {
+        passwordField.type = 'text';
+        toggleText.textContent = 'Ukryj';
+    } else {
+        passwordField.type = 'password';
+        toggleText.textContent = 'Pokaż';
+    }
+}
+</script>
+
+
+<footer>
+    <p>&copy; {% now 'Y' %} ExpenseEye</p>
+</footer>
+</div>
+{% endblock %}
