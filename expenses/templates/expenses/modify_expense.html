@@ -13,96 +13,178 @@
 
         <div class="expense-list">
             {% for expense in expenses %}
-                <div class="expense-item">
-                    <div class="expense-details">
-                        <span class="expense-date">{{ expense.date }}</span>
-                        <span class="expense-category">{{ expense.category.name }}</span>
-                        <span class="expense-amount">{{ expense.amount }} zł</span>
-                        {% if expense.description %}
-                            <span class="expense-description">{{ expense.description }}</span>
-                        {% endif %}
-                    </div>
-                    <div class="expense-actions">
-                        <button class="edit-btn" onclick="openEditForm({{ expense.id }})">
-                            <i class="fas fa-pencil-alt"></i>
-                        </button>
-                    </div>
+            <div class="expense-item" id="expense-{{ expense.id }}">
+                <div class="expense-details">
+                    <span class="expense-date">{{ expense.date }}</span>
+                    <span class="expense-category">{{ expense.category.name }}</span>
+                    <span class="expense-amount">{{ expense.amount }} zł</span>
+                    {% if expense.description %}
+                    <span class="expense-description">{{ expense.description }}</span>
+                    {% endif %}
                 </div>
+                <div class="expense-actions">
+                    <button class="edit-btn" onclick="editExpense({{ expense.id }})">
+                        <i data-lucide="pencil"></i>
+                    </button>
+                </div>
+            </div>
             {% empty %}
-                <p class="no-expenses">Brak wydatków do wyświetlenia</p>
+            <div class="no-expenses">
+                Brak wydatków do wyświetlenia
+            </div>
             {% endfor %}
         </div>
     </div>
 </div>
 
-<!-- Modal do edycji wydatku -->
-<div id="editModal" class="modal">
-    <div class="modal-content">
+<!-- Modal edycji -->
+<div id="editModal" class="delete-modal">
+    <div class="delete-modal-content">
         <div class="card-header">
             <h2>Edytuj wydatek</h2>
         </div>
-        
         <form id="editForm" method="POST">
             {% csrf_token %}
             <div class="form-group">
-                <label>Kwota (zł)</label>
-                <input type="number" name="amount" step="0.01" class="form-input" required>
+                <label for="edit_amount">Kwota</label>
+                <input type="number" id="edit_amount" name="amount" step="0.01" required class="form-input">
             </div>
-            
+
             <div class="form-group">
-                <label>Data</label>
-                <input type="date" name="date" class="form-input" required>
+                <label for="edit_date">Data</label>
+                <input type="date" id="edit_date" name="date" required class="form-input">
             </div>
-            
+
             <div class="form-group">
-                <label>Kategoria</label>
-                <select name="category" class="form-input" required>
+                <label for="edit_category">Kategoria</label>
+                <select id="edit_category" name="category" required class="form-input">
                     {% for category in categories %}
-                        <option value="{{ category.id }}">{{ category.name }}</option>
+                    <option value="{{ category.id }}">{{ category.name }}</option>
                     {% endfor %}
                 </select>
             </div>
-            
+
             <div class="form-group">
-                <label>Metoda płatności</label>
-                <select name="payment_method" class="form-input" required>
-                    <option value="cash">Gotówka</option>
-                    <option value="card">Karta</option>
-                </select>
+                <label for="edit_description">Opis (opcjonalnie)</label>
+                <textarea id="edit_description" name="description" class="form-input"></textarea>
             </div>
-            
-            <div class="form-group">
-                <label>Opis (opcjonalnie)</label>
-                <textarea name="description" class="form-input"></textarea>
-            </div>
-            
-            <div class="form-actions">
-                <button type="submit" class="submit-button">Zapisz zmiany</button>
-                <button type="button" onclick="closeEditModal()" class="secondary-button">Anuluj</button>
+
+            <div class="delete-modal-actions">
+                <button type="submit" class="confirm-btn">Zapisz zmiany</button>
+                <button type="button" class="cancel-btn" onclick="closeEditModal()">Anuluj</button>
             </div>
         </form>
     </div>
 </div>
 
+<div class="bottom-navigation">
+    <div class="nav-item" onclick="location.href='{% url 'dashboard' %}'">
+        <i data-lucide="home"></i>
+        <span>Panel główny</span>
+    </div>
+    <div class="nav-item" onclick="location.href='{% url 'budget' %}'">
+        <i data-lucide="wallet"></i>
+        <span>Zarządzaj wydatkami</span>
+    </div>
+</div>
+
+<div id="toast-container" class="toast-container"></div>
+
 <script>
-function openEditForm(expenseId) {
-    fetch(`/budget/get-expense/${expenseId}/`)
+let currentExpenseId = null;
+const editModal = document.getElementById('editModal');
+const editForm = document.getElementById('editForm');
+
+function editExpense(expenseId) {
+    currentExpenseId = expenseId;
+    fetch(`/budget/get_expense/${expenseId}/`)
         .then(response => response.json())
         .then(data => {
-            const form = document.getElementById('editForm');
-            form.elements['amount'].value = data.amount;
-            form.elements['date'].value = data.date;
-            form.elements['category'].value = data.category;
-            form.elements['payment_method'].value = data.payment_method;
-            form.elements['description'].value = data.description;
-            form.action = `/budget/modify/${expenseId}/`;
-            document.getElementById('editModal').style.display = 'block';
+            document.getElementById('edit_amount').value = data.amount;
+            document.getElementById('edit_date').value = data.date;
+            document.getElementById('edit_category').value = data.category;
+            document.getElementById('edit_description').value = data.description || '';
+            editModal.style.display = 'block';
         });
 }
 
 function closeEditModal() {
-    document.getElementById('editModal').style.display = 'none';
+    editModal.style.display = 'none';
+    currentExpenseId = null;
 }
+
+function showToast(message, type = 'success') {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+
+    const icon = document.createElement('i');
+    icon.setAttribute('data-lucide', type === 'success' ? 'check-circle' : 'x-circle');
+    toast.appendChild(icon);
+
+    const text = document.createElement('span');
+    text.textContent = message;
+    toast.appendChild(text);
+
+    container.appendChild(toast);
+
+    lucide.createIcons({
+        elements: [icon]
+    });
+
+    setTimeout(() => {
+        toast.style.animation = 'slideOut 0.3s ease-out';
+        setTimeout(() => {
+            container.removeChild(toast);
+        }, 300);
+    }, 3000);
+}
+
+editForm.onsubmit = function(e) {
+    e.preventDefault();
+    const formData = new FormData(editForm);
+
+    fetch(`/budget/modify_expense_confirm/${currentExpenseId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            amount: formData.get('amount'),
+            date: formData.get('date'),
+            category: formData.get('category'),
+            description: formData.get('description')
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            showToast('Wydatek został pomyślnie zmodyfikowany');
+            location.reload();
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Wystąpił błąd podczas modyfikacji wydatku', 'error');
+    })
+    .finally(() => {
+        closeEditModal();
+    });
+};
+
+window.onclick = function(event) {
+    if (event.target === editModal) {
+        closeEditModal();
+    }
+}
+
+lucide.createIcons();
 </script>
 
 {% endblock %}

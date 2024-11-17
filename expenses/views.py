@@ -1,12 +1,16 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login
 from .models import Expense, Category
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
 from .forms import ExpenseForm, UserRegistrationForm
 from django.db.models import Sum
 from django.utils import timezone
 from django.http import JsonResponse
+from decimal import Decimal
+from datetime import datetime
+import json
 
 MONTHS_PL = {
     1: 'Styczeń',
@@ -126,9 +130,6 @@ def add_expense(request):
                     category=category
                 )
                 expense.save()
-
-                if 'add_another' in request.POST:
-                    return redirect('add_expense')
                 return redirect('dashboard')
         else:
             if form.is_valid():
@@ -136,9 +137,6 @@ def add_expense(request):
                 expense.user = request.user
                 expense.save()
 
-                if 'add_another' in request.POST:
-                    return redirect('add_expense')
-                return redirect('dashboard')
     else:
         form = ExpenseForm()
 
@@ -152,10 +150,13 @@ def delete_expense(request):
 @login_required
 def delete_expense_confirm(request, expense_id):
     if request.method == 'POST':
-        expense = Expense.objects.get(id=expense_id, user=request.user)
-        expense.delete()
-        return JsonResponse({'success': True})
-    return JsonResponse({'success': False})
+        try:
+            expense = get_object_or_404(Expense, id=expense_id, user=request.user)
+            expense.delete()
+            return JsonResponse({'success': True})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=400)
+    return JsonResponse({'success': False, 'error': 'Invalid method'}, status=405)
 
 @login_required
 def modify_expense(request):
@@ -168,24 +169,50 @@ def modify_expense(request):
 
 @login_required
 def get_expense(request, expense_id):
-    expense = Expense.objects.get(id=expense_id, user=request.user)
-    return JsonResponse({
-        'amount': str(expense.amount),
-        'date': expense.date.strftime('%Y-%m-%d'),
-        'category': expense.category.id,
-        'payment_method': expense.payment_method,
-        'description': expense.description
-    })
+    try:
+        expense = get_object_or_404(Expense, id=expense_id, user=request.user)
+        return JsonResponse({
+            'amount': str(expense.amount),
+            'date': expense.date.strftime('%Y-%m-%d'),
+            'category': expense.category.id,
+            'description': expense.description or ''
+        })
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=400)
 
 @login_required
+@csrf_exempt  # Tymczasowo dla testów
 def modify_expense_confirm(request, expense_id):
     if request.method == 'POST':
-        expense = Expense.objects.get(id=expense_id, user=request.user)
-        form = ExpenseForm(request.POST, instance=expense)
-        if form.is_valid():
-            form.save()
-            return redirect('modify_expense')
-    return redirect('modify_expense')
+        try:
+            expense = get_object_or_404(Expense, id=expense_id, user=request.user)
+            data = json.loads(request.body)
+
+            expense.amount = Decimal(data.get('amount'))
+            expense.date = datetime.strptime(data.get('date'), '%Y-%m-%d').date()
+            expense.category = get_object_or_404(Category, id=int(data.get('category')))
+            expense.description = data.get('description', '')
+            expense.save()
+
+            return JsonResponse({
+                'success': True,
+                'message': 'Wydatek został zaktualizowany'
+            })
+        except Exception as e:
+            print(f"Error: {str(e)}")  # Debug
+            return JsonResponse({
+                'success': False,
+                'message': 'Wystąpił błąd podczas modyfikacji wydatku',
+                'error': str(e)
+            }, status=400)
+
+    return JsonResponse({
+        'success': False,
+        'message': 'Nieprawidłowa metoda'
+    }, status=405)
 
 @login_required
 def overview(request):

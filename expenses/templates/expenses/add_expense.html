@@ -46,9 +46,19 @@
 
             <div class="form-actions">
                 <button type="submit" class="submit-button">Dodaj wydatek</button>
-                <button type="submit" name="add_another" class="secondary-button">Dodaj i wprowadź następny</button>
             </div>
         </form>
+    </div>
+</div>
+
+<div class="bottom-navigation">
+    <div class="nav-item" onclick="location.href='{% url 'dashboard' %}'">
+        <i data-lucide="home"></i>
+        <span>Panel główny</span>
+    </div>
+    <div class="nav-item" onclick="location.href='{% url 'budget' %}'">
+        <i data-lucide="wallet"></i>
+        <span>Zarządzaj wydatkami</span>
     </div>
 </div>
 

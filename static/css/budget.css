@@ -8,66 +8,21 @@
     padding: 20px;
 }
 
-.form-card {
-    background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(10px);
-    border-radius: 20px;
-    padding: 40px;
-    width: 100%;
-    max-width: 600px;
-    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
-}
-
-.form-group {
-    margin-bottom: 20px;
-}
-
-.form-group label {
-    display: block;
-    color: #2f4151;
-    margin-bottom: 8px;
-    font-size: 14px;
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-    width: 100%;
-    padding: 12px 15px;
-    background: rgba(255, 255, 255, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 8px;
-    font-size: 14px;
-    color: #2f4151;
-    outline: none;
-}
-
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-    border-color: #2f4151;
-    box-shadow: 0 0 0 2px rgba(47, 65, 81, 0.1);
-}
-
-textarea {
-    min-height: 100px;
-    resize: vertical;
-}
-
+/* Style dla przycisków formularza */
 .form-actions {
     display: flex;
     gap: 10px;
     margin-top: 30px;
 }
 
-.submit-button,
-.secondary-button {
-    flex: 1;
-    padding: 12px;
+.submit-button {
+    padding: 12px 24px;
     border-radius: 8px;
-    font-size: 14px;
+    font-weight: 500;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all 0.2s ease;
+    font-size: 14px;
+    margin: auto;
 }
 
 .submit-button {
@@ -91,10 +46,56 @@ textarea {
     background: rgba(47, 65, 81, 0.1);
 }
 
+.form-card {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 40px;
+    width: 100%;
+    max-width: 600px;
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    color: #2f4151;
+    margin-bottom: 8px;
+    font-size: 14px;
+    text-align: left;
+}
+
+.form-input {
+    width: 100%;
+    padding: 12px 15px;
+    background: rgba(255, 255, 255, 0.3);
+    border: 1px solid black;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #2f4151;
+    outline: none;
+    margin-top: 8px;
+}
+
+.form-input:focus {
+    border-color: #2f4151;
+    box-shadow: 0 0 0 2px rgba(47, 65, 81, 0.1);
+}
+
+textarea.form-input {
+    min-height: 100px;
+    resize: vertical;
+}
+
 /* Style nagłówków i opisów formularza */
 .card-header {
-    text-align: center;
-    margin-bottom: 30px;
+    border-bottom: 1px solid rgba(47, 65, 81, 0.1);
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+    text-align: justify;
 }
 
 .card-header h2 {
@@ -102,40 +103,78 @@ textarea {
     font-size: 24px;
     font-weight: 500;
     margin-bottom: 10px;
+    text-align: center;
 }
 
 .quick-tips {
     color: #2f4151;
     font-size: 14px;
     opacity: 0.7;
+    text-align: center;
 }
 
-#new-category-wrapper {
+/* Style dla dolnej nawigacji */
+.bottom-navigation {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 16px;
+    cursor: pointer;
     transition: all 0.3s ease;
-    overflow: hidden;
+    color: #2f4151;
+    border-radius: 8px;
 }
 
-#new-category-wrapper input {
-    margin-top: 8px;
+.nav-item:hover {
+    background: rgba(47, 65, 81, 0.1);
+    transform: translateY(-2px);
+}
+
+.nav-item i {
+    width: 24px;
+    height: 24px;
+}
+
+.nav-item span {
+    font-size: 12px;
+    font-weight: 500;
+}
+
+/* Dodaj padding do form-container, żeby content nie był zasłonięty przez nawigację */
+.form-container {
+    padding-bottom: 80px;
+}
+
+/* Responsywność */
+@media (max-width: 768px) {
+    .bottom-navigation {
+        justify-content: space-around;
+        gap: 0;
+    }
+
+    .nav-item {
+        padding: 8px;
+    }
 }
 
 /* Style dla panelu zarządzania */
-.management-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 2rem;
-}
-
-.management-header {
-    text-align: center;
-    margin-bottom: 3rem;
-    color: #2f4151;
-}
-
 .management-options {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 2rem;
+    margin-top: 20px;
 }
 
 .option-card {
@@ -154,12 +193,6 @@ textarea {
     box-shadow: 0 12px 36px rgba(31, 38, 135, 0.2);
 }
 
-.option-icon {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-    color: #2f4151;
-}
-
 .option-card h3 {
     color: #2f4151;
     font-size: 20px;
@@ -174,16 +207,6 @@ textarea {
 }
 
 /* Style dla listy wydatków */
-.expense-list-container {
-    background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(10px);
-    border-radius: 20px;
-    padding: 2rem;
-    max-width: 1000px;
-    margin: 2rem auto;
-    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
-}
-
 .expense-list {
     margin-top: 20px;
 }
@@ -240,6 +263,9 @@ textarea {
     justify-content: flex-end;
 }
 
+
+
+/* Style dla przycisków */
 .delete-btn, .edit-btn {
     background: none;
     border: none;
@@ -248,6 +274,9 @@ textarea {
     border-radius: 50%;
     transition: all 0.3s;
     color: #2f4151;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .delete-btn:hover {
@@ -260,63 +289,131 @@ textarea {
     color: #2196f3;
 }
 
+.delete-btn svg,
+.edit-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
 /* Style dla modalu */
-.modal {
+.delete-modal {
     display: none;
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(5px);
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
     z-index: 1000;
 }
 
-.modal-content {
-    background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(10px);
-    border-radius: 20px;
+.delete-modal-content {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border-radius: 15px;
     padding: 30px;
-    max-width: 500px;
-    margin: 50px auto;
-    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    text-align: center;
 }
 
-.modal-actions {
+.delete-modal-content h2 {
+    color: #2f4151;
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.delete-modal-actions {
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
     gap: 1rem;
-    margin-top: 1rem;
+    margin-top: 2rem;
 }
 
-.confirm-btn, .cancel-btn {
-    padding: 12px 20px;
+.confirm-btn,
+.cancel-btn {
+    padding: 12px 24px;
     border-radius: 8px;
-    border: none;
+    font-weight: 500;
     cursor: pointer;
-    font-size: 14px;
-    transition: all 0.3s;
+    transition: all 0.2s ease;
 }
 
 .confirm-btn {
-    background: #2f4151;
+    background: #EF4444;
     color: white;
+    border: none;
 }
 
 .confirm-btn:hover {
-    background: #567C8D;
+    background: #DC2626;
     transform: translateY(-1px);
 }
 
 .cancel-btn {
-    background: transparent;
-    color: #2f4151;
-    border: 1px solid #2f4151;
+    background: #F3F4F6;
+    color: #4B5563;
+    border: none;
 }
 
 .cancel-btn:hover {
-    background: rgba(47, 65, 81, 0.1);
+    background: #E5E7EB;
+}
+
+/* Style dla powiadomień */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.toast {
+    padding: 16px 24px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    animation: slideIn 0.3s ease-out;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.toast-success {
+    background-color: #10B981;
+}
+
+.toast-error {
+    background-color: #EF4444;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
 }
 
 /* Responsywność */
@@ -330,8 +427,59 @@ textarea {
         gap: 0.5rem;
     }
 
-    .modal-content {
+    .delete-modal-content {
         margin: 20px;
         padding: 20px;
     }
+}
+
+/* Style dla panelu zarządzania */
+.management-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-top: 30px;
+}
+
+.option-card {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.option-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 36px rgba(31, 38, 135, 0.2);
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.option-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    color: #2f4151;
+}
+
+.option-icon i {
+    width: 48px;
+    height: 48px;
+    stroke-width: 1.5;
+}
+
+.option-card h3 {
+    color: #2f4151;
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 1rem;
+}
+
+.option-card p {
+    color: #2f4151;
+    font-size: 14px;
+    opacity: 0.7;
+    line-height: 1.4;
 }

@@ -2,6 +2,9 @@
 {% load static %}
 {% block content %}
 
+<!-- Kontener na powiadomienia -->
+<div id="toast-container" class="toast-container"></div>
+
 <div class="form-container">
     <div class="form-card">
         <div class="card-header">
@@ -13,86 +16,214 @@
 
         <div class="expense-list">
             {% for expense in expenses %}
-                <div class="expense-item">
-                    <div class="expense-details">
-                        <span class="expense-date">{{ expense.date }}</span>
-                        <span class="expense-category">{{ expense.category.name }}</span>
-                        <span class="expense-amount">{{ expense.amount }} zł</span>
-                        {% if expense.description %}
-                            <span class="expense-description">{{ expense.description }}</span>
-                        {% endif %}
-                    </div>
-                    <div class="expense-actions">
-                        <button class="delete-btn" onclick="confirmDelete({{ expense.id }})">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
+            <div class="expense-item" id="expense-{{ expense.id }}">
+                <div class="expense-details">
+                    <span class="expense-date">{{ expense.date }}</span>
+                    <span class="expense-category">{{ expense.category.name }}</span>
+                    <span class="expense-amount">{{ expense.amount }} zł</span>
+                    {% if expense.description %}
+                    <span class="expense-description">{{ expense.description }}</span>
+                    {% endif %}
                 </div>
+                <div class="expense-actions">
+                    <button class="delete-btn" onclick="confirmDelete({{ expense.id }})">
+                        <i data-lucide="trash-2"></i>
+                    </button>
+                </div>
+            </div>
             {% empty %}
-                <p class="no-expenses">Brak wydatków do wyświetlenia</p>
+            <div class="no-expenses">
+                Brak wydatków do wyświetlenia
+            </div>
             {% endfor %}
         </div>
     </div>
 </div>
 
-<!-- Modal do potwierdzenia usunięcia -->
-<div id="deleteModal" class="modal">
-    <div class="modal-content">
-        <div class="card-header">
-            <h2>Potwierdzenie usunięcia</h2>
-            <p>Czy na pewno chcesz usunąć ten wydatek?</p>
-        </div>
-        <div class="modal-actions">
-            <button onclick="deleteExpense()" class="submit-button">Tak, usuń</button>
-            <button onclick="closeModal()" class="secondary-button">Anuluj</button>
+<!-- Modal potwierdzenia usunięcia -->
+<div id="deleteModal" class="delete-modal">
+    <div class="delete-modal-content">
+        <h2>Potwierdzenie usunięcia</h2>
+        <p>Czy na pewno chcesz usunąć ten wydatek?</p>
+        <div class="delete-modal-actions">
+            <button class="delete-confirm-btn" onclick="deleteExpense()">Tak, usuń</button>
+            <button class="delete-cancel-btn" onclick="closeModal()">Anuluj</button>
         </div>
     </div>
 </div>
 
+<div class="bottom-navigation">
+    <div class="nav-item" onclick="location.href='{% url 'dashboard' %}'">
+        <i data-lucide="home"></i>
+        <span>Panel główny</span>
+    </div>
+    <div class="nav-item" onclick="location.href='{% url 'budget' %}'">
+        <i data-lucide="wallet"></i>
+        <span>Zarządzaj wydatkami</span>
+    </div>
+</div>
+
+{% csrf_token %}
+
+<style>
+.delete-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+}
+
+.delete-modal-content {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.delete-modal-content h2 {
+    color: #2f4151;
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.delete-modal-content p {
+    color: #4B5563;
+    font-size: 16px;
+    margin-bottom: 25px;
+}
+
+.delete-modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.delete-confirm-btn,
+.delete-cancel-btn {
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.delete-confirm-btn {
+    background: #EF4444;
+    color: white;
+    border: none;
+}
+
+.delete-confirm-btn:hover {
+    background: #DC2626;
+    transform: translateY(-1px);
+}
+
+.delete-cancel-btn {
+    background: #F3F4F6;
+    color: #4B5563;
+    border: none;
+}
+
+.delete-cancel-btn:hover {
+    background: #E5E7EB;
+}
+</style>
+
 <script>
-let expenseToDelete = null;
+let currentExpenseId = null;
+const modal = document.getElementById('deleteModal');
+
+function showToast(message, type = 'success') {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+
+    const icon = document.createElement('i');
+    icon.setAttribute('data-lucide', type === 'success' ? 'check-circle' : 'x-circle');
+    toast.appendChild(icon);
+
+    const text = document.createElement('span');
+    text.textContent = message;
+    toast.appendChild(text);
+
+    container.appendChild(toast);
+
+    lucide.createIcons({
+        elements: [icon]
+    });
+
+    setTimeout(() => {
+        toast.style.animation = 'slideOut 0.3s ease-out';
+        setTimeout(() => {
+            container.removeChild(toast);
+        }, 300);
+    }, 3000);
+}
 
 function confirmDelete(expenseId) {
-    expenseToDelete = expenseId;
-    document.getElementById('deleteModal').style.display = 'block';
+    currentExpenseId = expenseId;
+    modal.style.display = 'block';
 }
 
 function closeModal() {
-    document.getElementById('deleteModal').style.display = 'none';
+    modal.style.display = 'none';
+    currentExpenseId = null;
 }
 
 function deleteExpense() {
-    if (expenseToDelete) {
-        fetch(`/budget/delete/${expenseToDelete}/`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': getCookie('csrftoken'),
-            },
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
+    if (!currentExpenseId) return;
+
+    fetch(`/budget/delete_expense_confirm/${currentExpenseId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'Content-Type': 'application/json'
+        },
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            const expenseElement = document.getElementById(`expense-${currentExpenseId}`);
+            if (expenseElement) {
+                expenseElement.remove();
+                showToast(data.message || 'Wydatek został pomyślnie usunięty');
             }
-        });
-    }
-    closeModal();
+            closeModal();
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Wystąpił błąd podczas usuwania wydatku', 'error');
+        closeModal();
+    });
 }
 
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
+window.onclick = function(event) {
+    if (event.target == modal) {
+        closeModal();
     }
-    return cookieValue;
 }
+
+lucide.createIcons();
 </script>
 
 {% endblock %}

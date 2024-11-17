@@ -7,27 +7,27 @@
         <div class="card-header">
             <h2>Zarządzaj wydatkami</h2>
         </div>
-        
+
         <div class="management-options">
             <div class="option-card" onclick="location.href='{% url 'add_expense' %}'">
                 <div class="option-icon">
-                    <i class="fas fa-plus-circle"></i>
+                    <i data-lucide="plus-circle"></i>
                 </div>
                 <h3>Dodaj wydatek</h3>
                 <p>Wprowadź nowy wydatek do systemu</p>
             </div>
-            
+
             <div class="option-card" onclick="location.href='{% url 'delete_expense' %}'">
                 <div class="option-icon">
-                    <i class="fas fa-trash"></i>
+                    <i data-lucide="trash-2"></i>
                 </div>
                 <h3>Usuń wydatek</h3>
                 <p>Usuń istniejący wydatek z systemu</p>
             </div>
-            
+
             <div class="option-card" onclick="location.href='{% url 'modify_expense' %}'">
                 <div class="option-icon">
-                    <i class="fas fa-edit"></i>
+                    <i data-lucide="edit"></i>
                 </div>
                 <h3>Modyfikuj wydatek</h3>
                 <p>Edytuj szczegóły istniejącego wydatku</p>
@@ -35,5 +35,26 @@
         </div>
     </div>
 </div>
+
+<div class="bottom-navigation">
+    <div class="nav-item" onclick="location.href='{% url 'overview' %}'">
+        <i data-lucide="search"></i>
+        <span>Szukaj</span>
+    </div>
+    <div class="nav-item" onclick="location.href='{% url 'dashboard' %}'">
+        <i data-lucide="home"></i>
+        <span>Panel główny</span>
+    </div>
+    <div class="nav-item" onclick="location.href='{% url 'reports' %}'">
+        <i data-lucide="chart-column"></i>
+        <span>Raporty</span>
+    </div>
+</div>
+
+
+
+<script>
+    lucide.createIcons();
+</script>
 
 {% endblock %}
