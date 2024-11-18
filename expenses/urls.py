@@ -12,7 +12,7 @@ urlpatterns = [
     path('budget/get_expense/<int:expense_id>/', views.get_expense, name='get_expense'),
     path('budget/modify_expense_confirm/<int:expense_id>/', views.modify_expense_confirm,
          name='modify_expense_confirm'),
-    path('overview/', views.overview, name='overview'),
+    path('filters/', views.filters, name='filters'),
     path('goals/', views.goals, name='goals'),
     path('reports/', views.reports, name='reports'),
     path('settings/', views.settings, name='settings'),

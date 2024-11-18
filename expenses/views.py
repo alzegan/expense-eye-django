@@ -2,15 +2,17 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login
 from .models import Expense, Category
+from expenses.forms import ExpenseFilterForm
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
-from .forms import ExpenseForm, UserRegistrationForm
-from django.db.models import Sum
+from .forms import (ExpenseForm, UserRegistrationForm)
+from django.db.models import Sum, Q
 from django.utils import timezone
 from django.http import JsonResponse
 from decimal import Decimal
 from datetime import datetime
 import json
+
 
 MONTHS_PL = {
     1: 'Styczeń',
@@ -215,14 +217,37 @@ def modify_expense_confirm(request, expense_id):
     }, status=405)
 
 @login_required
-def overview(request):
-    return render(request, 'expenses/overview.html')
+def filters(request):
+    return render(request, 'expenses/filters.html')
 
+
+@login_required
+def filters(request):
+    expenses = Expense.objects.filter(user=request.user)
+    form = ExpenseFilterForm(request.GET)
+
+    if form.is_valid():
+        if form.cleaned_data['min_amount']:
+            expenses = expenses.filter(amount__gte=form.cleaned_data['min_amount'])
+        if form.cleaned_data['max_amount']:
+            expenses = expenses.filter(amount__lte=form.cleaned_data['max_amount'])
+        if form.cleaned_data['category']:
+            expenses = expenses.filter(category=form.cleaned_data['category'])
+        if form.cleaned_data['date_from']:
+            expenses = expenses.filter(date__gte=form.cleaned_data['date_from'])
+        if form.cleaned_data['date_to']:
+            expenses = expenses.filter(date__lte=form.cleaned_data['date_to'])
+        if form.cleaned_data['description']:
+            expenses = expenses.filter(description__icontains=form.cleaned_data['description'])
+
+    return render(request, 'expenses/filters.html', {
+        'expenses': expenses,
+        'form': form
+    })
 
 @login_required
 def goals(request):
     return render(request, 'expenses/goals.html')
-
 
 @login_required
 def reports(request):

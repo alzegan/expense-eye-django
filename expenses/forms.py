@@ -95,3 +95,27 @@ class CategoryForm(forms.ModelForm):
     class Meta:
         model = Category
         fields = ['name']
+
+class ExpenseFilterForm(forms.Form):
+    min_amount = forms.DecimalField(required=False, label="Minimalna kwota")
+    max_amount = forms.DecimalField(required=False, label="Maksymalna kwota")
+    category = forms.ModelChoiceField(
+        queryset=Category.objects.all(),
+        required=False,
+        empty_label="----",
+        label="Kategoria"
+    )
+    date_from = forms.DateField(
+        required=False,
+        widget=forms.DateInput(attrs={'type': 'date'}),
+        label="Data od"
+    )
+    date_to = forms.DateField(
+        required=False,
+        widget=forms.DateInput(attrs={'type': 'date'}),
+        label="Data do"
+    )
+    description = forms.CharField(
+        required=False,
+        label="Opis zawiera"
+    )
