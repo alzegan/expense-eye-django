@@ -1,11 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login
-from .models import Expense, Category
+from .models import Expense, Category, FinancialGoal
 from expenses.forms import ExpenseFilterForm
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
-from .forms import (ExpenseForm, UserRegistrationForm)
+from .forms import ExpenseForm, UserRegistrationForm, ExpenseFilterForm, FinancialGoalForm
 from django.db.models import Sum, Q
 from django.utils import timezone
 from django.http import JsonResponse
@@ -63,15 +63,12 @@ def user_register(request):
         form = UserRegistrationForm()
     return render(request, 'register_page.html', {'form': form})
 
-
 @login_required
 def dashboard(request):
     current_month = timezone.now().month
     current_year = timezone.now().year
-
     formatted_date = f"{MONTHS_PL[current_month]} {current_year}"
 
-    # Pobierz wydatki z bieżącego miesiąca
     monthly_expenses = Expense.objects.filter(
         user=request.user,
         date__month=current_month,
@@ -91,15 +88,18 @@ def dashboard(request):
         total=Sum('amount')
     ).order_by('-total')
 
-    print("Debug - Ostatnie wydatki:")
-    for expense in recent_expenses:
-        print(f"Data: {expense.date}, Kategoria: {expense.category.name}, Kwota: {expense.amount}")
+    financial_goals = FinancialGoal.objects.filter(
+        user=request.user,
+        archived=False,
+        deadline__gte=timezone.now()
+    ).order_by('deadline')[:3]
 
     context = {
         'total_month': total_month,
         'recent_expenses': recent_expenses,
         'expenses_by_category': expenses_by_category,
         'current_month': formatted_date,
+        'financial_goals': financial_goals,
     }
 
     response = render(request, 'expenses/dashboard.html', context)
@@ -107,7 +107,6 @@ def dashboard(request):
     response['Pragma'] = 'no-cache'
     response['Expires'] = '0'
     return response
-
 
 @login_required
 def budget(request):
@@ -218,11 +217,6 @@ def modify_expense_confirm(request, expense_id):
 
 @login_required
 def filters(request):
-    return render(request, 'expenses/filters.html')
-
-
-@login_required
-def filters(request):
     expenses = Expense.objects.filter(user=request.user)
     form = ExpenseFilterForm(request.GET)
 
@@ -245,9 +239,73 @@ def filters(request):
         'form': form
     })
 
+
 @login_required
 def goals(request):
-    return render(request, 'expenses/goals.html')
+    user_goals = FinancialGoal.objects.filter(
+        user=request.user,
+        archived=False
+    ).order_by('deadline')
+
+    if request.method == 'POST':
+        form = FinancialGoalForm(request.POST)
+        if form.is_valid():
+            goal = form.save(commit=False)
+            goal.user = request.user
+            goal.save()
+            return redirect('goals')
+    else:
+        form = FinancialGoalForm()
+
+    return render(request, 'expenses/goals.html', {
+        'goals': user_goals,
+        'form': form
+    })
+
+@login_required
+def update_goal_progress(request, goal_id):
+    if request.method == 'POST':
+        try:
+            goal = get_object_or_404(FinancialGoal, id=goal_id, user=request.user)
+            data = json.loads(request.body)
+            amount = Decimal(str(data.get('amount', 0)))
+
+            goal.current_amount = goal.current_amount + amount
+
+            # Sprawdź czy cel został osiągnięty
+            if goal.current_amount >= goal.target_amount:
+                goal.archived = True
+                goal.achieved_date = timezone.now()
+
+            goal.save()
+
+            remaining = goal.get_remaining_amount()
+            progress = goal.get_progress_percentage()
+
+            return JsonResponse({
+                'success': True,
+                'new_amount': float(goal.current_amount),
+                'remaining': float(remaining),
+                'progress': progress,
+                'goal_achieved': goal.archived
+            })
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            }, status=400)
+    return JsonResponse({'success': False}, status=405)
+
+@login_required
+def delete_goal(request, goal_id):
+    if request.method == 'POST':
+        try:
+            goal = get_object_or_404(FinancialGoal, id=goal_id, user=request.user)
+            goal.delete()
+            return JsonResponse({'success': True})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=400)
+    return JsonResponse({'success': False}, status=405)
 
 @login_required
 def reports(request):

@@ -1,3 +1,87 @@
+/* Layout główny */
+.layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+    position: fixed;
+    width: 260px;
+    height: 100vh;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #2f4151;
+    font-size: 20px;
+    font-weight: 500;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+.logo i {
+    width: 20px;
+    height: 20px;
+    stroke-width: 1.5;
+    color: #2f4151;
+}
+
+.sidebar-nav {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    color: #2f4151;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.nav-item i {
+    width: 20px;
+    height: 20px;
+}
+
+.nav-item:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.nav-item.active {
+    background: rgba(47, 65, 81, 0.9);
+    color: white;
+}
+
+.sidebar-footer {
+    margin-top: auto;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Kontener filtrów */
 .filters-container {
     flex: 1;
     display: flex;
@@ -5,6 +89,7 @@
     align-items: center;
     padding: 20px;
     padding-bottom: 80px;
+    margin-left: 260px;
 }
 
 .filters-card {
@@ -17,6 +102,23 @@
     box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
 }
 
+.card-header {
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.card-header h2 {
+    font-size: 24px;
+    color: #2f4151;
+    margin-bottom: 10px;
+}
+
+.card-header p {
+    color: #2f4151;
+    opacity: 0.8;
+}
+
+/* Formularz filtrów */
 .filters-form {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -24,6 +126,33 @@
     margin-bottom: 30px;
 }
 
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    color: #2f4151;
+    font-weight: 500;
+}
+
+.form-input {
+    padding: 12px;
+    border: 1px solid rgba(47, 65, 81, 0.2);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.3);
+    color: #2f4151;
+    transition: all 0.2s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #2f4151;
+    box-shadow: 0 0 0 2px rgba(47, 65, 81, 0.1);
+}
+
+/* Przyciski akcji */
 .filters-actions {
     grid-column: 1 / -1;
     display: flex;
@@ -44,13 +173,88 @@
     font-size: 14px;
 }
 
-/* Nadpisanie stylów z budget.css dla lepszej responsywności */
+.submit-button {
+    background: #2f4151;
+    color: white;
+    border: none;
+}
+
+.submit-button:hover {
+    background: #567C8D;
+    transform: translateY(-1px);
+}
+
+.secondary-button {
+    background: transparent;
+    color: #2f4151;
+    border: 1px solid #2f4151;
+}
+
+.secondary-button:hover {
+    background: rgba(47, 65, 81, 0.1);
+}
+
+/* Lista wydatków */
 .expense-list {
     margin-top: 30px;
 }
 
+.expense-item {
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    transition: all 0.2s ease;
+}
+
+.expense-item:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
 .expense-details {
+    display: grid;
     grid-template-columns: auto auto 1fr auto;
+    gap: 20px;
+    align-items: center;
+}
+
+.expense-date {
+    color: #2f4151;
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+.expense-category {
+    color: #2f4151;
+    font-weight: 500;
+}
+
+.expense-amount {
+    color: #2f4151;
+    font-weight: 600;
+    text-align: right;
+}
+
+.expense-description {
+    color: #2f4151;
+    opacity: 0.8;
+}
+
+/* Responsywność */
+@media (max-width: 1024px) {
+    .filters-container {
+        margin-left: 0;
+        padding: 16px;
+    }
+
+    .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+    }
+
+    .sidebar.show {
+        transform: translateX(0);
+    }
 }
 
 @media (max-width: 768px) {
@@ -64,6 +268,14 @@
 
     .expense-details {
         grid-template-columns: 1fr;
-        gap: 5px;
+        gap: 8px;
+    }
+
+    .expense-item {
+        padding: 12px;
+    }
+
+    .filters-card {
+        padding: 20px;
     }
 }

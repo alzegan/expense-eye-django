@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block content %}
 
+{% block content %}
 <div class="layout">
     <div class="sidebar">
         <div class="logo">
@@ -9,42 +9,40 @@
             ExpenseEye
         </div>
 
-        <nav class="sidebar-nav">
-            <a href="{% url 'dashboard' %}" class="nav-item active">
-                <i data-lucide="home"></i>
-                Panel główny
-            </a>
-            <a href="{% url 'budget' %}" class="nav-item">
-                <i data-lucide="wallet"></i>
-                Zarządzaj wydatkami
-            </a>
-            <a href="{% url 'filters' %}" class="nav-item">
-                <i data-lucide="search"></i>
-                Szukaj
-            </a>
-            <a href="{% url 'goals' %}" class="nav-item">
-                <i data-lucide="target"></i>
-                Cele
-            </a>
-            <a href="{% url 'reports' %}" class="nav-item">
-                <i data-lucide="chart-column"></i>
-                Raporty
-            </a>
+        <a href="{% url 'dashboard' %}" class="nav-item active">
+            <i data-lucide="home"></i>
+            Panel główny
+        </a>
+        <a href="{% url 'budget' %}" class="nav-item">
+            <i data-lucide="wallet"></i>
+            Zarządzaj wydatkami
+        </a>
+        <a href="{% url 'filters' %}" class="nav-item">
+            <i data-lucide="search"></i>
+            Szukaj
+        </a>
+        <a href="{% url 'goals' %}" class="nav-item">
+            <i data-lucide="target"></i>
+            Cele
+        </a>
+        <a href="{% url 'reports' %}" class="nav-item">
+            <i data-lucide="bar-chart-2"></i>
+            Raporty
+        </a>
 
-            <div class="sidebar-footer">
-                <a href="{% url 'settings' %}" class="nav-item logout">
-                    <i data-lucide="settings"></i>
-                    Ustawienia
-                </a>
-                <a href="{% url 'login' %}" class="nav-item logout">
-                    <i data-lucide="log-out"></i>
-                    Wyloguj
-                </a>
-            </div>
-        </nav>
+        <div class="sidebar-footer">
+            <a href="{% url 'settings' %}" class="nav-item">
+                <i data-lucide="settings"></i>
+                Ustawienia
+            </a>
+            <a href="{% url 'login' %}" class="nav-item">
+                <i data-lucide="log-out"></i>
+                Wyloguj
+            </a>
+        </div>
     </div>
 
-    <main class="main-content" role="main">
+    <div class="main-content" role="main">
         <div class="dashboard">
             <div class="dashboard-grid">
                 <div class="dashboard-card summary-card">
@@ -82,14 +80,52 @@
                         {% endfor %}
                     </div>
                 </div>
+
+                <div class="dashboard-card">
+                    <div class="goals-widget-header">
+                        <h2>Cele finansowe</h2>
+                        <a href="{% url 'goals' %}" class="see-all-link">Zobacz wszystkie</a>
+                    </div>
+                    <div class="goals-widget">
+                        {% if financial_goals %}
+                            {% for goal in financial_goals %}
+                                <div class="goal-item">
+                                    <div class="goal-header">
+                                        <div class="goal-title">
+                                            <i data-lucide="piggy-bank"></i>
+                                            <h3>{{ goal.name }}</h3>
+                                        </div>
+                                        <span class="goal-deadline">{{ goal.deadline|date:"d.m.Y" }}</span>
+                                    </div>
+                                    <div class="progress-container">
+                                        <div class="progress-bar-bg">
+                                            <div class="progress-bar"
+                                                 style="width: {{ goal.get_progress_percentage }}%">
+                                            </div>
+                                        </div>
+                                        <div class="progress-values">
+                                            <span>{{ goal.current_amount|floatformat:2 }} zł</span>
+                                            <span>Cel: {{ goal.target_amount|floatformat:2 }} zł</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="no-goals">
+                                <i data-lucide="target"></i>
+                                <p>Brak aktywnych celów</p>
+                                <a href="{% url 'goals' %}">Dodaj swój pierwszy cel</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
         </div>
-    </main>
+    </div>
 </div>
 
 <script src="https://unpkg.com/lucide@latest"></script>
 <script>
     lucide.createIcons();
 </script>
-
 {% endblock %}

@@ -1,96 +1,97 @@
 {% extends 'base.html' %}
 {% load widget_tweaks %}
 {% load static %}
-{% block content %}
 
+{% block content %}
 <div class="layout">
     <div class="sidebar">
-        <div class="logo">
-            <i data-lucide="eye-closed"></i>
-            ExpenseEye
-        </div>
-
-        <nav class="sidebar-nav">
-            <a href="{% url 'dashboard' %}" class="nav-item active">
-                <i data-lucide="home"></i>
-                Panel główny
-            </a>
-            <a href="{% url 'budget' %}" class="nav-item">
-                <i data-lucide="wallet"></i>
-                Zarządzaj wydatkami
-            </a>
-            <a href="{% url 'filters' %}" class="nav-item">
-                <i data-lucide="search"></i>
-                Szukaj
-            </a>
-            <a href="{% url 'goals' %}" class="nav-item">
-                <i data-lucide="target"></i>
-                Cele
-            </a>
-            <a href="{% url 'reports' %}" class="nav-item">
-                <i data-lucide="chart-column"></i>
-                Raporty
-            </a>
-
-            <div class="sidebar-footer">
-                <a href="{% url 'settings' %}" class="nav-item logout">
-                    <i data-lucide="settings"></i>
-                    Ustawienia
-                </a>
-                <a href="{% url 'login' %}" class="nav-item logout">
-                    <i data-lucide="log-out"></i>
-                    Wyloguj
-                </a>
+        <div class="sidebar-content">
+            <div class="logo">
+                <i data-lucide="eye-off"></i>
+                ExpenseEye
             </div>
-        </nav>
-    </div>
 
-<div class="filters-container">
-    <div class="filters-card">
-        <div class="card-header">
-            <h2>Wyszukaj wydatki</h2>
-            <p class="quick-tips">Użyj filtrów, aby znaleźć konkretne wydatki</p>
-        </div>
-
-        <form method="get" class="filters-form">
-            {% for field in form %}
-            <div class="form-group">
-                {{ field.label_tag }}
-                {{ field|add_class:"form-input" }}
-            </div>
-            {% endfor %}
-
-            <div class="filters-actions">
-                <button type="submit" class="submit-button">
+            <nav class="sidebar-nav">
+                <a href="{% url 'dashboard' %}" class="nav-item">
+                    <i data-lucide="home"></i>
+                    Panel główny
+                </a>
+                <a href="{% url 'budget' %}" class="nav-item">
+                    <i data-lucide="wallet"></i>
+                    Zarządzaj wydatkami
+                </a>
+                <a href="{% url 'filters' %}" class="nav-item active">
                     <i data-lucide="search"></i>
                     Szukaj
-                </button>
-                <a href="{% url 'filters' %}" class="secondary-button">
-                    <i data-lucide="x"></i>
-                    Wyczyść filtry
                 </a>
-            </div>
-        </form>
+                <a href="{% url 'goals' %}" class="nav-item">
+                    <i data-lucide="target"></i>
+                    Cele
+                </a>
+                <a href="{% url 'reports' %}" class="nav-item">
+                    <i data-lucide="bar-chart-2"></i>
+                    Raporty
+                </a>
+            </nav>
+        </div>
 
-        <div class="expense-list">
-            {% for expense in expenses %}
-            <div class="expense-item">
-                <div class="expense-details">
-                    <span class="expense-date">{{ expense.date }}</span>
-                    <span class="expense-category">{{ expense.category.name }}</span>
-                    <span class="expense-amount">{{ expense.amount }} zł</span>
-                    <span class="expense-description">{{ expense.description }}</span>
-                </div>
+        <footer class="sidebar-footer">
+            <a href="{% url 'settings' %}" class="nav-item">
+                <i data-lucide="settings"></i>
+                Ustawienia
+            </a>
+            <a href="{% url 'login' %}" class="nav-item">
+                <i data-lucide="log-out"></i>
+                Wyloguj
+            </a>
+        </footer>
+    </div>
+
+    <div class="filters-container">
+        <div class="filters-card">
+            <div class="card-header">
+                <h2>Wyszukaj wydatki</h2>
+                <p>Użyj filtrów, aby znaleźć konkretne wydatki</p>
             </div>
-            {% endfor %}
+
+            <form class="filters-form" method="GET">
+                {% for field in form %}
+                <div class="form-group">
+                    {{ field.label_tag }}
+                    {{ field|add_class:"form-input" }}
+                </div>
+                {% endfor %}
+
+                <div class="filters-actions">
+                    <button type="submit" class="submit-button">
+                        <i data-lucide="search"></i>
+                        Szukaj
+                    </button>
+                    <a href="{% url 'filters' %}" class="secondary-button">
+                        <i data-lucide="x"></i>
+                        Wyczyść filtry
+                    </a>
+                </div>
+            </form>
+
+            <div class="expense-list">
+                {% for expense in expenses %}
+                <div class="expense-item">
+                    <div class="expense-details">
+                        <span class="expense-date">{{ expense.date }}</span>
+                        <span class="expense-category">{{ expense.category.name }}</span>
+                        <span class="expense-amount">{{ expense.amount }} zł</span>
+                        <span class="expense-description">{{ expense.description }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
         </div>
     </div>
 </div>
-
 
 <script src="https://unpkg.com/lucide@latest"></script>
 <script>
     lucide.createIcons();
 </script>
-    
 {% endblock %}

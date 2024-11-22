@@ -1,5 +1,5 @@
 from django import forms
-from .models import Expense, Category
+from .models import Expense, Category, FinancialGoal
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.utils import timezone
@@ -119,3 +119,24 @@ class ExpenseFilterForm(forms.Form):
         required=False,
         label="Opis zawiera"
     )
+
+class FinancialGoalForm(forms.ModelForm):
+    class Meta:
+        model = FinancialGoal
+        fields = ['name', 'target_amount', 'deadline']
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'Nazwa celu'
+            }),
+            'target_amount': forms.NumberInput(attrs={
+                'class': 'form-input',
+                'step': '0.01',
+                'min': '0',
+                'placeholder': '0.00'
+            }),
+            'deadline': forms.DateInput(attrs={
+                'class': 'form-input',
+                'type': 'date'
+            })
+        }

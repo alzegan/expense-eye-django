@@ -14,6 +14,8 @@ urlpatterns = [
          name='modify_expense_confirm'),
     path('filters/', views.filters, name='filters'),
     path('goals/', views.goals, name='goals'),
+    path('goals/<int:goal_id>/update/', views.update_goal_progress, name='update_goal_progress'),
+    path('goals/<int:goal_id>/delete/', views.delete_goal, name='delete_goal'),
     path('reports/', views.reports, name='reports'),
     path('settings/', views.settings, name='settings'),
 ]

@@ -1,0 +1,355 @@
+/* Główny kontener */
+.goals-container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    gap: 2rem;
+    min-height: calc(100vh - 100px);
+}
+
+/* Sekcja nowego celu */
+.new-goal-section {
+    flex: 0 0 400px;
+}
+
+/* Sekcja listy celów */
+.goals-list-section {
+    flex: 1;
+}
+
+/* Style dla centrowania formularza gdy nie ma celów */
+.goals-container.no-goals {
+    justify-content: center;
+}
+
+.goals-container.no-goals .new-goal-section {
+    flex: 0 0 400px;
+}
+
+.goals-container.no-goals .goals-list-section {
+    display: none;
+}
+
+/* Karta nowego celu */
+.new-goal-card {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+}
+
+.new-goal-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.new-goal-icon {
+    margin-bottom: 1rem;
+    color: #2f4151;
+}
+
+/* Style dla formularza dodawania */
+.goal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-field {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: block;
+    color: #2f4151;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(47, 65, 81, 0.2);
+    border-radius: 8px;
+    color: #2f4151;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #2f4151;
+    box-shadow: 0 0 0 2px rgba(47, 65, 81, 0.1);
+}
+
+.submit-goal-button {
+    width: 100%;
+    padding: 0.75rem;
+    background: #2f4151;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: background-color 0.2s ease;
+    margin-top: 1rem;
+}
+
+.submit-goal-button:hover {
+    background: #567C8D;
+}
+
+/* Style dla kart celów */
+.goal-card {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 1.5rem;
+    position: relative;
+    margin-bottom: 1rem;
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+}
+
+/* Header celu z tytułem i nazwą */
+.goal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.goal-name-section {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.goal-name-section h3 {
+    color: #2f4151;
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+/* Przycisk usuwania */
+.delete-goal-button {
+    padding: 6px 12px;
+    background: transparent;
+    border: 1px solid #2f4151;
+    color: #2f4151;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.delete-goal-button:hover {
+    background: rgba(47, 65, 81, 0.1);
+}
+
+/* Progress bar */
+.progress-bar-bg {
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+    overflow: hidden;
+    margin: 1rem 0;
+}
+
+.progress-bar {
+    height: 100%;
+    background: #2f4151;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+/* Informacje o celu */
+.goal-info {
+    margin: 1rem 0;
+}
+
+.goal-stat {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    color: #2f4151;
+    font-size: 0.95rem;
+}
+
+/* Formularz aktualizacji */
+.update-form {
+    margin-top: 1rem;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.amount-input {
+    flex: 1;
+    padding: 0.75rem;
+    border: 1px solid rgba(47, 65, 81, 0.2);
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    color: #2f4151;
+}
+
+.update-button {
+    padding: 0.75rem 1rem;
+    background: #2f4151;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background-color 0.2s ease;
+}
+
+.update-button:hover {
+    background: #567C8D;
+}
+
+/* Modal usuwania */
+.delete-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+}
+
+.delete-modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 2rem;
+    border-radius: 1rem;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+}
+
+.delete-modal-content h2 {
+    color: #2f4151;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.delete-modal-content p {
+    color: #4B5563;
+    margin-bottom: 1.5rem;
+}
+
+.delete-modal-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.confirm-btn {
+    padding: 0.75rem 1.5rem;
+    background: #EF4444;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.confirm-btn:hover {
+    background: #DC2626;
+}
+
+.cancel-btn {
+    padding: 0.75rem 1.5rem;
+    background: #E5E7EB;
+    color: #4B5563;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.cancel-btn:hover {
+    background: #D1D5DB;
+}
+
+/* Responsywność */
+@media (max-width: 768px) {
+    .goals-container {
+        flex-direction: column;
+    }
+
+    .new-goal-section {
+        flex: none;
+        width: 100%;
+    }
+
+    .update-form {
+        flex-direction: column;
+    }
+
+    .update-button {
+        width: 100%;
+    }
+
+    .delete-modal-content {
+        margin: 20px;
+        padding: 1.5rem;
+    }
+}
+
+.achievement-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 20px;
+    background: rgba(47, 65, 81, 0.95);
+    color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 1000;
+    transform: translateX(120%);
+    transition: transform 0.3s ease-out;
+}
+
+.achievement-notification.show {
+    transform: translateX(0);
+}
+
+.achievement-icon {
+    font-size: 24px;
+    color: #FFD700;
+}
+
+.achievement-content {
+    flex: 1;
+}
+
+.achievement-title {
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.achievement-message {
+    font-size: 14px;
+    opacity: 0.9;
+}
