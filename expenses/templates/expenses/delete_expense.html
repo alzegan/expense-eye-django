@@ -2,64 +2,91 @@
 {% load static %}
 {% block content %}
 
-<!-- Kontener na powiadomienia -->
-<div id="toast-container" class="toast-container"></div>
-
-<div class="form-container">
-    <div class="form-card">
-        <div class="card-header">
-            <h2>Usuń wydatek</h2>
-            <div class="quick-tips">
-                Wybierz wydatek, który chcesz usunąć z systemu
-            </div>
+<div class="layout">
+    <div class="sidebar">
+        <div class="logo">
+            <i data-lucide="eye-closed"></i>
+            ExpenseEye
         </div>
 
-        <div class="expense-list">
-            {% for expense in expenses %}
-            <div class="expense-item" id="expense-{{ expense.id }}">
-                <div class="expense-details">
-                    <span class="expense-date">{{ expense.date }}</span>
-                    <span class="expense-category">{{ expense.category.name }}</span>
-                    <span class="expense-amount">{{ expense.amount }} zł</span>
-                    {% if expense.description %}
-                    <span class="expense-description">{{ expense.description }}</span>
-                    {% endif %}
+        <nav class="sidebar-nav">
+            <a href="{% url 'dashboard' %}" class="nav-item active">
+                <i data-lucide="home"></i>
+                Panel główny
+            </a>
+            <a href="{% url 'add_expense' %}" class="nav-item">
+                <i data-lucide="plus-circle"></i>
+                Dodaj wydatek
+            </a>
+            <a href="{% url 'modify_expense' %}" class="nav-item">
+                <i data-lucide="edit"></i>
+                Modyfikuj wydatek
+            </a>
+            <a href="{% url 'reports' %}" class="nav-item">
+                <i data-lucide="chart-column"></i>
+                Raporty
+            </a>
+
+            <div class="sidebar-footer">
+                <a href="{% url 'settings' %}" class="nav-item logout">
+                    <i data-lucide="settings"></i>
+                    Ustawienia
+                </a>
+                <a href="{% url 'login' %}" class="nav-item logout">
+                    <i data-lucide="log-out"></i>
+                    Wyloguj
+                </a>
+            </div>
+        </nav>
+    </div>
+
+    <div id="toast-container" class="toast-container"></div>
+
+    <div class="form-container">
+        <div class="form-card">
+            <div class="card-header">
+                <h2>Usuń wydatek</h2>
+                <div class="quick-tips">
+                    Wybierz wydatek, który chcesz usunąć z systemu
                 </div>
-                <div class="expense-actions">
-                    <button class="delete-btn" onclick="confirmDelete({{ expense.id }})">
-                        <i data-lucide="trash-2"></i>
-                    </button>
+            </div>
+
+            <div class="expense-list">
+                {% for expense in expenses %}
+                <div class="expense-item" id="expense-{{ expense.id }}">
+                    <div class="expense-details">
+                        <span class="expense-date">{{ expense.date }}</span>
+                        <span class="expense-category">{{ expense.category.name }}</span>
+                        <span class="expense-amount">{{ expense.amount }} zł</span>
+                        {% if expense.description %}
+                        <span class="expense-description">{{ expense.description }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="expense-actions">
+                        <button class="delete-btn" onclick="confirmDelete({{ expense.id }})">
+                            <i data-lucide="trash-2"></i>
+                        </button>
+                    </div>
                 </div>
+                {% empty %}
+                <div class="no-expenses">
+                    Brak wydatków do wyświetlenia
+                </div>
+                {% endfor %}
             </div>
-            {% empty %}
-            <div class="no-expenses">
-                Brak wydatków do wyświetlenia
-            </div>
-            {% endfor %}
         </div>
     </div>
-</div>
 
-<!-- Modal potwierdzenia usunięcia -->
-<div id="deleteModal" class="delete-modal">
-    <div class="delete-modal-content">
-        <h2>Potwierdzenie usunięcia</h2>
-        <p>Czy na pewno chcesz usunąć ten wydatek?</p>
-        <div class="delete-modal-actions">
-            <button class="delete-confirm-btn" onclick="deleteExpense()">Tak, usuń</button>
-            <button class="delete-cancel-btn" onclick="closeModal()">Anuluj</button>
+    <!-- Modal potwierdzenia usunięcia -->
+    <div id="deleteModal" class="delete-modal">
+        <div class="delete-modal-content">
+            <h2>Potwierdzenie usunięcia</h2>
+            <p>Czy na pewno chcesz usunąć ten wydatek?</p>
+            <div class="delete-modal-actions">
+                <button class="delete-confirm-btn" onclick="deleteExpense()">Tak, usuń</button>
+                <button class="delete-cancel-btn" onclick="closeModal()">Anuluj</button>
+            </div>
         </div>
-    </div>
-</div>
-
-<div class="bottom-navigation">
-    <div class="nav-item" onclick="location.href='{% url 'dashboard' %}'">
-        <i data-lucide="home"></i>
-        <span>Panel główny</span>
-    </div>
-    <div class="nav-item" onclick="location.href='{% url 'budget' %}'">
-        <i data-lucide="wallet"></i>
-        <span>Zarządzaj wydatkami</span>
     </div>
 </div>
 

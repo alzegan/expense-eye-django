@@ -7,21 +7,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ExpenseEye - Kontrola wydatków</title>
 
+    <script src="https://unpkg.com/lucide@latest"></script>
+
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
     <link rel="stylesheet" href="{% static 'css/budget.css' %}">
     <link rel="stylesheet" href="{% static 'css/filters.css' %}">
     <link rel="stylesheet" href="{% static 'css/goals.css' %}">
+    <link rel="stylesheet" href="{% static 'css/archive.css' %}">
 
-    <script src="https://unpkg.com/lucide@latest"></script>
+
 </head>
 <body>
 
     {% block content %}{% endblock %}
 
     <script>
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
             lucide.createIcons();
     </script>
 
+    {% block extra_js  %}{% endblock %}
 </body>
 </html>

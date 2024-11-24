@@ -7,7 +7,7 @@
     <div class="sidebar">
         <div class="sidebar-content">
             <div class="logo">
-                <i data-lucide="eye-off"></i>
+                <i data-lucide="eye-closed"></i>
                 ExpenseEye
             </div>
 
@@ -29,8 +29,12 @@
                     Cele
                 </a>
                 <a href="{% url 'reports' %}" class="nav-item">
-                    <i data-lucide="bar-chart-2"></i>
+                    <i data-lucide="chart-column"></i>
                     Raporty
+                </a>
+                <a href="{% url 'achieved_goals' %}" class="nav-item">
+                    <i data-lucide="archive"></i>
+                    Archiwum
                 </a>
             </nav>
         </div>

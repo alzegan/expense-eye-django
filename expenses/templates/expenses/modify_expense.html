@@ -2,93 +2,121 @@
 {% load static %}
 {% block content %}
 
-<div class="form-container">
-    <div class="form-card">
-        <div class="card-header">
-            <h2>Modyfikuj wydatek</h2>
-            <div class="quick-tips">
-                Wybierz wydatek, który chcesz zmodyfikować
-            </div>
+<div class="layout">
+    <div class="sidebar">
+        <div class="logo">
+            <i data-lucide="eye-closed"></i>
+            ExpenseEye
         </div>
 
-        <div class="expense-list">
-            {% for expense in expenses %}
-            <div class="expense-item" id="expense-{{ expense.id }}">
-                <div class="expense-details">
-                    <span class="expense-date">{{ expense.date }}</span>
-                    <span class="expense-category">{{ expense.category.name }}</span>
-                    <span class="expense-amount">{{ expense.amount }} zł</span>
-                    {% if expense.description %}
-                    <span class="expense-description">{{ expense.description }}</span>
-                    {% endif %}
+        <nav class="sidebar-nav">
+            <a href="{% url 'dashboard' %}" class="nav-item active">
+                <i data-lucide="home"></i>
+                Panel główny
+            </a>
+            <a href="{% url 'add_expense' %}" class="nav-item">
+                <i data-lucide="plus-circle"></i>
+                Dodaj wydatek
+            </a>
+            <a href="{% url 'delete_expense' %}" class="nav-item">
+                <i data-lucide="trash-2"></i>
+                Usuń wydatek
+            </a>
+            <a href="{% url 'reports' %}" class="nav-item">
+                <i data-lucide="chart-column"></i>
+                Raporty
+            </a>
+
+            <div class="sidebar-footer">
+                <a href="{% url 'settings' %}" class="nav-item logout">
+                    <i data-lucide="settings"></i>
+                    Ustawienia
+                </a>
+                <a href="{% url 'login' %}" class="nav-item logout">
+                    <i data-lucide="log-out"></i>
+                    Wyloguj
+                </a>
+            </div>
+        </nav>
+    </div>
+
+    <div class="form-container">
+        <div class="form-card">
+            <div class="card-header">
+                <h2>Modyfikuj wydatek</h2>
+                <div class="quick-tips">
+                    Wybierz wydatek, który chcesz zmodyfikować
                 </div>
-                <div class="expense-actions">
-                    <button class="edit-btn" onclick="editExpense({{ expense.id }})">
-                        <i data-lucide="pencil"></i>
-                    </button>
+            </div>
+
+            <div class="expense-list">
+                {% for expense in expenses %}
+                <div class="expense-item" id="expense-{{ expense.id }}">
+                    <div class="expense-details">
+                        <span class="expense-date">{{ expense.date }}</span>
+                        <span class="expense-category">{{ expense.category.name }}</span>
+                        <span class="expense-amount">{{ expense.amount }} zł</span>
+                        {% if expense.description %}
+                        <span class="expense-description">{{ expense.description }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="expense-actions">
+                        <button class="edit-btn" onclick="editExpense({{ expense.id }})">
+                            <i data-lucide="pencil"></i>
+                        </button>
+                    </div>
                 </div>
+                {% empty %}
+                <div class="no-expenses">
+                    Brak wydatków do wyświetlenia
+                </div>
+                {% endfor %}
             </div>
-            {% empty %}
-            <div class="no-expenses">
-                Brak wydatków do wyświetlenia
-            </div>
-            {% endfor %}
         </div>
     </div>
-</div>
 
-<!-- Modal edycji -->
-<div id="editModal" class="delete-modal">
-    <div class="delete-modal-content">
-        <div class="card-header">
-            <h2>Edytuj wydatek</h2>
+    <!-- Modal edycji -->
+    <div id="editModal" class="delete-modal">
+        <div class="delete-modal-content">
+            <div class="card-header">
+                <h2>Edytuj wydatek</h2>
+            </div>
+            <form id="editForm" method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="edit_amount">Kwota</label>
+                    <input type="number" id="edit_amount" name="amount" step="0.01" required class="form-input">
+                </div>
+
+                <div class="form-group">
+                    <label for="edit_date">Data</label>
+                    <input type="date" id="edit_date" name="date" required class="form-input">
+                </div>
+
+                <div class="form-group">
+                    <label for="edit_category">Kategoria</label>
+                    <select id="edit_category" name="category" required class="form-input">
+                        {% for category in categories %}
+                        <option value="{{ category.id }}">{{ category.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit_description">Opis (opcjonalnie)</label>
+                    <textarea id="edit_description" name="description" class="form-input"></textarea>
+                </div>
+
+                <div class="delete-modal-actions">
+                    <button type="submit" class="confirm-btn">Zapisz zmiany</button>
+                    <button type="button" class="cancel-btn" onclick="closeEditModal()">Anuluj</button>
+                </div>
+            </form>
         </div>
-        <form id="editForm" method="POST">
-            {% csrf_token %}
-            <div class="form-group">
-                <label for="edit_amount">Kwota</label>
-                <input type="number" id="edit_amount" name="amount" step="0.01" required class="form-input">
-            </div>
-
-            <div class="form-group">
-                <label for="edit_date">Data</label>
-                <input type="date" id="edit_date" name="date" required class="form-input">
-            </div>
-
-            <div class="form-group">
-                <label for="edit_category">Kategoria</label>
-                <select id="edit_category" name="category" required class="form-input">
-                    {% for category in categories %}
-                    <option value="{{ category.id }}">{{ category.name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="edit_description">Opis (opcjonalnie)</label>
-                <textarea id="edit_description" name="description" class="form-input"></textarea>
-            </div>
-
-            <div class="delete-modal-actions">
-                <button type="submit" class="confirm-btn">Zapisz zmiany</button>
-                <button type="button" class="cancel-btn" onclick="closeEditModal()">Anuluj</button>
-            </div>
-        </form>
     </div>
+
+    <div id="toast-container" class="toast-container"></div>
 </div>
-
-<div class="bottom-navigation">
-    <div class="nav-item" onclick="location.href='{% url 'dashboard' %}'">
-        <i data-lucide="home"></i>
-        <span>Panel główny</span>
-    </div>
-    <div class="nav-item" onclick="location.href='{% url 'budget' %}'">
-        <i data-lucide="wallet"></i>
-        <span>Zarządzaj wydatkami</span>
-    </div>
-</div>
-
-<div id="toast-container" class="toast-container"></div>
 
 <script>
 let currentExpenseId = null;

@@ -1,6 +1,52 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block content %} 
+{% block content %}
+
+<div class="layout">
+    <div class="sidebar">
+        <div class="logo">
+            <i data-lucide="eye-closed"></i>
+            ExpenseEye
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="{% url 'dashboard' %}" class="nav-item">
+                <i data-lucide="home"></i>
+                Panel główny
+            </a>
+            <a href="{% url 'budget' %}" class="nav-item">
+                <i data-lucide="wallet"></i>
+                Zarządzaj wydatkami
+            </a>
+            <a href="{% url 'filters' %}" class="nav-item">
+                <i data-lucide="search"></i>
+                Szukaj
+            </a>
+            <a href="{% url 'goals' %}" class="nav-item">
+                <i data-lucide="target"></i>
+                Cele
+            </a>
+            <a href="{% url 'reports' %}" class="nav-item active">
+                <i data-lucide="chart-column"></i>
+                Raporty
+            </a>
+            <a href="{% url 'achieved_goals' %}" class="nav-item">
+            <i data-lucide="archive"></i>
+            Archiwum
+        </a>
+
+            <div class="sidebar-footer">
+                <a href="{% url 'settings' %}" class="nav-item logout">
+                    <i data-lucide="settings"></i>
+                    Ustawienia
+                </a>
+                <a href="{% url 'login' %}" class="nav-item logout">
+                    <i data-lucide="log-out"></i>
+                    Wyloguj
+                </a>
+            </div>
+        </nav>
+    </div>
     
     
 {% endblock %}

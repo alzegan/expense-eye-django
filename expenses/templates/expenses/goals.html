@@ -1,10 +1,5 @@
 {% extends 'base.html' %}
 {% load static %}
-
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/goals.css' %}">
-{% endblock %}
-
 {% block content %}
 
 <div class="layout">
@@ -15,7 +10,7 @@
         </div>
 
         <nav class="sidebar-nav">
-            <a href="{% url 'dashboard' %}" class="nav-item active">
+            <a href="{% url 'dashboard' %}" class="nav-item">
                 <i data-lucide="home"></i>
                 Panel główny
             </a>
@@ -27,7 +22,7 @@
                 <i data-lucide="search"></i>
                 Szukaj
             </a>
-            <a href="{% url 'goals' %}" class="nav-item">
+            <a href="{% url 'goals' %}" class="nav-item active">
                 <i data-lucide="target"></i>
                 Cele
             </a>
@@ -35,281 +30,350 @@
                 <i data-lucide="chart-column"></i>
                 Raporty
             </a>
-
-            <div class="sidebar-footer">
-                <a href="{% url 'settings' %}" class="nav-item logout">
-                    <i data-lucide="settings"></i>
-                    Ustawienia
-                </a>
-                <a href="{% url 'login' %}" class="nav-item logout">
-                    <i data-lucide="log-out"></i>
-                    Wyloguj
-                </a>
-            </div>
+            <a href="{% url 'achieved_goals' %}" class="nav-item">
+                <i data-lucide="archive"></i>
+                Archiwum
+            </a>
         </nav>
+
+        <div class="sidebar-footer">
+            <a href="{% url 'settings' %}" class="nav-item logout">
+                <i data-lucide="settings"></i>
+                Ustawienia
+            </a>
+            <a href="{% url 'login' %}" class="nav-item logout">
+                <i data-lucide="log-out"></i>
+                Wyloguj
+            </a>
+        </div>
     </div>
 
-    <div class="goals-container {% if not goals %}no-goals{% endif %}">
-    <div class="new-goal-section">
-        <div class="new-goal-card">
-            <div class="new-goal-header">
-                <div class="new-goal-icon">
-                    <i data-lucide="target" class="w-8 h-8"></i>
+    <div class="main-content">
+        <h2 class="section-title">Aktywne cele</h2>
+
+        <div class="goals-container {% if not goals %}no-goals{% endif %}">
+            <div class="new-goal-section">
+                <div class="new-goal-card">
+                    <div class="new-goal-header">
+                        <div class="new-goal-icon">
+                            <i data-lucide="target"></i>
+                        </div>
+                        <h2>Dodaj nowy cel finansowy</h2>
+                        <p>Zdefiniuj swój cel i śledź postępy w jego realizacji</p>
+                    </div>
+
+                    <form class="goal-form" method="POST">
+                        {% csrf_token %}
+                        {% for field in form %}
+                        <div class="form-field">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                            <span class="error-message">{{ field.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                        <button type="submit" class="update-button">
+                            <i data-lucide="plus"></i>
+                            Dodaj cel
+                        </button>
+                    </form>
                 </div>
-                <h2>Dodaj nowy cel finansowy</h2>
-                <p>Zdefiniuj swój cel i śledź postępy w jego realizacji</p>
+                <a href="{% url 'achieved_goals' %}" class="view-archived-btn">
+                    <i data-lucide="archive"></i>
+                    Zobacz osiągnięte cele
+                </a>
             </div>
 
-            <form method="POST" class="goal-form">
-                {% csrf_token %}
-                {% for field in form %}
-                <div class="form-field">
-                    <label class="form-label">{{ field.label }}</label>
-                    {{ field }}
-                    {% if field.errors %}
-                    <span class="error-message">{{ field.errors.0 }}</span>
-                    {% endif %}
+            <div class="goals-list-section">
+                {% if goals %}
+                {% for goal in goals %}
+                <div class="goal-card" goal-id="{{ goal.id }}">
+                    <div class="goal-header">
+                        <div class="goal-name-section">
+                            <h3>{{ goal.name }}</h3>
+                        </div>
+                        <button class="delete-goal-button" data-goal-id="{{ goal.id }}">
+                            <i data-lucide="trash-2"></i>
+                            Usuń cel
+                        </button>
+                    </div>
+
+                    <div class="progress-bar-bg">
+                        <div id="progress-bar-{{ goal.id }}"
+                             class="progress-bar"
+                             style="width: {{ goal.get_progress_percentage }}%">
+                        </div>
+                    </div>
+
+                    <div class="goal-info">
+                        <div class="goal-stat">
+                            <i data-lucide="wallet"></i>
+                            <span class="current-amount">Obecna kwota: {{ goal.current_amount }} zł</span>
+                        </div>
+                        <div class="goal-stat">
+                            <i data-lucide="flag"></i>
+                            <span class="goal-amount">Cel: {{ goal.target_amount }} zł</span>
+                        </div>
+                        <div class="goal-stat">
+                            <i data-lucide="trending-up"></i>
+                            <span class="remaining-amount">Pozostało: {{ goal.get_remaining_amount }} zł</span>
+                        </div>
+                        <div class="goal-stat">
+                            <i data-lucide="calendar"></i>
+                            Termin: {{ goal.deadline|date:"d.m.Y" }}
+                        </div>
+                    </div>
+
+                    <form class="update-form" method="POST" action="{% url 'update_goal_progress' goal.id %}" onsubmit="return false;">
+                        {% csrf_token %}
+                        <input type="number"
+                               name="amount"
+                               class="amount-input"
+                               step="any"
+                               inputmode="decimal"
+                               placeholder="0.00"
+                               required>
+                        <button type="submit" class="update-button">
+                            <i data-lucide="rotate-ccw"></i>
+                            Aktualizuj
+                        </button>
+                    </form>
                 </div>
                 {% endfor %}
-                <button type="submit" class="submit-goal-button">
-                    <i data-lucide="plus-circle" class="w-4 h-4"></i>
-                    Dodaj cel
-                </button>
-            </form>
-        </div>
-    </div>
-
-    {% if goals %}
-    <div class="goals-list-section">
-        {% for goal in goals %}
-        <div class="goal-card" data-goal-id="{{ goal.id }}">
-            <div class="goal-header">
-                <div class="goal-name-section">
-                    <i data-lucide="piggy-bank" class="w-6 h-6"></i>
-                    <h3>{{ goal.name }}</h3>
-                </div>
-                <button class="delete-goal-button" data-goal-id="{{ goal.id }}">
-                    <i data-lucide="trash-2" class="w-4 h-4"></i>
-                    Usuń cel
-                </button>
+                {% endif %}
             </div>
-
-            <div class="progress-bar-bg">
-                <div class="progress-bar"
-                     style="width: {{ goal.get_progress_percentage }}%"
-                     id="progress-bar-{{ goal.id }}">
-                </div>
-            </div>
-
-            <div class="goal-info">
-                <div class="goal-stat">
-                    <i data-lucide="wallet" class="w-4 h-4"></i>
-                    <span class="current-amount">Obecna kwota: {{ goal.current_amount }} zł</span>
-                </div>
-                <div class="goal-stat">
-                    <i data-lucide="target" class="w-4 h-4"></i>
-                    <span class="goal-amount">Cel: {{ goal.target_amount }} zł</span>
-                </div>
-                <div class="goal-stat">
-                    <i data-lucide="coins" class="w-4 h-4"></i>
-                    <span class="remaining-amount">Pozostało: {{ goal.get_remaining_amount }} zł</span>
-                </div>
-                <div class="goal-stat">
-                    <i data-lucide="calendar" class="w-4 h-4"></i>
-                    <span>Termin: {{ goal.deadline|date:"d.m.Y" }}</span>
-                </div>
-            </div>
-
-            <form class="update-form" data-goal-id="{{ goal.id }}">
-                {% csrf_token %}
-                <input type="number" name="amount" step="0.01"
-                       class="amount-input"
-                       placeholder="Kwota">
-                <button type="submit" class="update-button">
-                    <i data-lucide="refresh-cw" class="w-4 h-4"></i>
-                    Aktualizuj
-                </button>
-            </form>
-        </div>
-        {% endfor %}
-    </div>
-    {% endif %}
-</div>
-
-    <!-- Powiadomienie o osiągnięciu celu -->
-    <div id="achievementNotification" class="achievement-notification">
-        <div class="achievement-icon">
-            <i data-lucide="trophy" class="w-8 h-8"></i>
-        </div>
-        <div class="achievement-content">
-            <div class="achievement-title">Gratulacje!</div>
-            <div class="achievement-message">Osiągnąłeś swój cel finansowy!</div>
         </div>
     </div>
 </div>
 
-<!-- Modal potwierdzenia usunięcia -->
 <div id="deleteModal" class="delete-modal">
     <div class="delete-modal-content">
         <h2>Usunąć cel?</h2>
-        <p>Czy na pewno chcesz usunąć ten cel? Tej operacji nie można cofnąć.</p>
+        <p>Czy na pewno chcesz usunąć ten cel?</p>
         <div class="delete-modal-actions">
-            <button id="confirmDelete" class="confirm-btn">Usuń</button>
-            <button id="cancelDelete" class="cancel-btn">Anuluj</button>
+            <button class="confirm-btn">
+                <i data-lucide="trash-2"></i>
+                Usuń
+            </button>
+            <button class="cancel-btn">
+                <i data-lucide="x"></i>
+                Anuluj
+            </button>
         </div>
     </div>
 </div>
 
-<!-- Scripts -->
-<script src="https://unpkg.com/lucide@latest"></script>
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+<div id="achievementNotification" class="achievement-notification">
+    <div class="achievement-icon">
+        <i data-lucide="trophy"></i>
+    </div>
+    <div class="achievement-content">
+        <div class="achievement-title">Gratulacje!</div>
+        <div class="achievement-message">Osiągnąłeś swój cel finansowy!</div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
 <script>
+document.addEventListener('DOMContentLoaded', function() {
     // Inicjalizacja ikon Lucide
     lucide.createIcons();
 
-    // Funkcja do wywołania konfetti
-    function celebrateAchievement() {
-        // Konfetti z lewej strony
-        confetti({
-            particleCount: 100,
-            spread: 70,
-            origin: { x: 0.1, y: 0.6 }
-        });
-
-        // Konfetti z prawej strony
-        setTimeout(() => {
-            confetti({
-                particleCount: 100,
-                spread: 70,
-                origin: { x: 0.9, y: 0.6 }
-            });
-        }, 250);
-    }
-
-    // Funkcja pokazująca powiadomienie
-    function showAchievementNotification(goalName) {
-        const notification = document.getElementById('achievementNotification');
-        notification.querySelector('.achievement-message').textContent =
-            `Osiągnąłeś swój cel: ${goalName}!`;
-        notification.classList.add('show');
-
-        setTimeout(() => {
-            notification.classList.remove('show');
-        }, 5000);
-    }
-
     // Obsługa formularzy aktualizacji
     document.querySelectorAll('.update-form').forEach(form => {
-        form.addEventListener('submit', async (e) => {
+        form.addEventListener('submit', async function(e) {
             e.preventDefault();
-            const goalId = form.dataset.goalId;
-            const amountInput = form.querySelector('input[name="amount"]');
-            const amount = parseFloat(amountInput.value);
+            console.log('Form submitted');
 
-            if (!amount || isNaN(amount)) {
-                alert('Proszę podać prawidłową kwotę');
-                return;
-            }
+            const goalCard = this.closest('.goal-card');
+            const formData = new FormData(this);
 
             try {
-                const response = await fetch(`/goals/${goalId}/update/`, {
+                console.log('Sending request to:', this.action);
+                const response = await fetch(this.action, {
                     method: 'POST',
                     headers: {
-                        'X-CSRFToken': form.querySelector('[name="csrfmiddlewaretoken"]').value,
-                        'Content-Type': 'application/json'
+                        'X-CSRFToken': formData.get('csrfmiddlewaretoken')
                     },
-                    body: JSON.stringify({ amount: amount })
+                    body: formData
                 });
 
-                const data = await response.json();
-                if (data.success) {
-                    // Aktualizuj pasek postępu
-                    const progressBar = document.querySelector(`#progress-bar-${goalId}`);
-                    progressBar.style.width = `${data.progress}%`;
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        // Aktualizacja widoku
+                        goalCard.querySelector('.current-amount').textContent =
+                            `Obecna kwota: ${data.new_amount.toFixed(2)} zł`;
+                        goalCard.querySelector('.remaining-amount').textContent =
+                            `Pozostało: ${data.remaining.toFixed(2)} zł`;
+                        goalCard.querySelector('.progress-bar').style.width =
+                            `${data.progress}%`;
 
-                    // Aktualizuj wyświetlane kwoty
-                    const goalCard = form.closest('.goal-card');
-                    goalCard.querySelector('.current-amount').textContent =
-                        `Obecna kwota: ${data.new_amount.toFixed(2)} zł`;
-                    goalCard.querySelector('.remaining-amount').textContent =
-                        `Pozostało: ${data.remaining.toFixed(2)} zł`;
+                        // Reset formularza
+                        this.reset();
 
-                    // Sprawdź czy cel został osiągnięty
-                    if (data.goal_achieved) {
-                        const goalName = goalCard.querySelector('.goal-name-section h3').textContent;
-                        celebrateAchievement();
-                        showAchievementNotification(goalName);
+                        // Jeśli cel został osiągnięty
+                        if (data.goal_achieved || data.progress >= 100) {
+                            showAchievementNotification();
+                            showFireworks();
+
+                            // Ukrywamy kartę po animacji
+                            setTimeout(() => {
+                                goalCard.style.opacity = '0';
+                                setTimeout(() => {
+                                    goalCard.remove();
+
+                                    // Sprawdzamy czy to był ostatni cel
+                                    const remainingGoals = document.querySelectorAll('.goal-card');
+                                    if (remainingGoals.length === 0) {
+                                        document.querySelector('.goals-container').classList.add('no-goals');
+                                    }
+                                }, 500);
+                            }, 3000);
+                        }
                     }
-
-                    // Wyczyść formularz
-                    form.reset();
                 }
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Błąd:', error);
                 alert('Wystąpił błąd podczas aktualizacji celu');
             }
         });
     });
 
     // Obsługa usuwania celu
-    const deleteModal = document.getElementById('deleteModal');
-    const confirmDelete = document.getElementById('confirmDelete');
-    const cancelDelete = document.getElementById('cancelDelete');
-    let currentGoalToDelete = null;
-
-    // Obsługa przycisków usuwania
     document.querySelectorAll('.delete-goal-button').forEach(button => {
-        button.addEventListener('click', () => {
-            currentGoalToDelete = button.dataset.goalId;
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const goalId = this.dataset.goalId;
+            const deleteModal = document.getElementById('deleteModal');
+
+            // Konfiguracja przycisków modalu
+            const confirmBtn = deleteModal.querySelector('.confirm-btn');
+            const cancelBtn = deleteModal.querySelector('.cancel-btn');
+
+            // Wyświetlenie modalu
             deleteModal.style.display = 'block';
+
+            // Obsługa potwierdzenia usunięcia
+            const handleConfirm = async () => {
+                try {
+                    const response = await fetch(`/goals/${goalId}/delete/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                        }
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.success) {
+                            // Usunięcie karty celu z widoku
+                            const goalCard = document.querySelector(`[goal-id="${goalId}"]`);
+                            goalCard.remove();
+
+                            // Sprawdzenie czy to był ostatni cel
+                            const remainingGoals = document.querySelectorAll('.goal-card');
+                            if (remainingGoals.length === 0) {
+                                document.querySelector('.goals-container').classList.add('no-goals');
+                            }
+                        }
+                    }
+                } catch (error) {
+                    console.error('Błąd:', error);
+                    alert('Wystąpił błąd podczas usuwania celu');
+                }
+
+                // Zamknięcie modalu
+                deleteModal.style.display = 'none';
+
+                // Usunięcie event listenerów
+                cleanupModal();
+            };
+
+            // Obsługa anulowania
+            const handleCancel = () => {
+                deleteModal.style.display = 'none';
+                cleanupModal();
+            };
+
+            // Czyszczenie event listenerów
+            const cleanupModal = () => {
+                confirmBtn.removeEventListener('click', handleConfirm);
+                cancelBtn.removeEventListener('click', handleCancel);
+            };
+
+            // Dodanie event listenerów
+            confirmBtn.addEventListener('click', handleConfirm);
+            cancelBtn.addEventListener('click', handleCancel);
+
+            // Zamykanie modalu przy kliknięciu poza nim
+            window.onclick = function(event) {
+                if (event.target === deleteModal) {
+                    deleteModal.style.display = 'none';
+                    cleanupModal();
+                }
+            };
         });
     });
 
-    // Zamknięcie modalu przy kliknięciu Anuluj
-    cancelDelete.addEventListener('click', () => {
-        deleteModal.style.display = 'none';
-        currentGoalToDelete = null;
-    });
+    function showFireworks() {
+        const colors = ['#FFD700', '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4'];
+        const confettiContainer = document.createElement('div');
+        confettiContainer.className = 'confetti-container';
+        document.body.appendChild(confettiContainer);
 
-    // Obsługa potwierdzenia usunięcia
-    confirmDelete.addEventListener('click', async () => {
-        if (!currentGoalToDelete) return;
+        // Tworzymy konfetti
+        for (let i = 0; i < 50; i++) {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            confetti.style.left = `${Math.random() * 100}%`;
+            confetti.style.animationDelay = `${Math.random() * 3}s`;
+            confetti.style.animationDuration = `${Math.random() * 2 + 2}s`;
+            confettiContainer.appendChild(confetti);
+        }
 
-        try {
-            const response = await fetch(`/goals/${currentGoalToDelete}/delete/`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                }
-            });
+        // Usuwamy kontener po animacji
+        setTimeout(() => {
+            confettiContainer.remove();
+        }, 5000);
+    }
 
-            const data = await response.json();
-            if (data.success) {
-                // Znajdź i usuń kartę celu z DOM
-                const goalCard = document.querySelector(`.goal-card[data-goal-id="${currentGoalToDelete}"]`);
-                goalCard.remove();
+    // Funkcja pokazująca powiadomienie
+    function showAchievementNotification() {
+        const notification = document.getElementById('achievementNotification');
+        notification.classList.add('show');
+        setTimeout(() => {
+            notification.classList.remove('show');
+        }, 3000);
+    }
 
-                // Sprawdź czy to był ostatni cel
-                const remainingGoals = document.querySelectorAll('.goal-card');
-                if (remainingGoals.length === 0) {
-                    document.querySelector('.goals-container').classList.add('no-goals');
+    // Obsługa wprowadzania kwot
+    document.querySelectorAll('.amount-input').forEach(input => {
+        input.addEventListener('input', function(e) {
+            // Akceptujemy tylko cyfry i kropkę
+            this.value = this.value.replace(/[^0-9.]/g, '');
+
+            // Upewniamy się, że jest tylko jedna kropka
+            const parts = this.value.split('.');
+            if (parts.length > 2) {
+                this.value = parts[0] + '.' + parts.slice(1).join('');
+            }
+        });
+
+        // Formatowanie przy utracie fokusu
+        input.addEventListener('blur', function() {
+            if (this.value) {
+                const value = parseFloat(this.value);
+                if (!isNaN(value)) {
+                    this.value = value.toFixed(2);
                 }
             }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Wystąpił błąd podczas usuwania celu');
-        } finally {
-            deleteModal.style.display = 'none';
-            currentGoalToDelete = null;
-        }
+        });
     });
-
-    // Zamknięcie modalu przy kliknięciu poza nim
-    window.addEventListener('click', (e) => {
-        if (e.target === deleteModal) {
-            deleteModal.style.display = 'none';
-            currentGoalToDelete = null;
-        }
-    });
+});
 </script>
 {% endblock %}

@@ -262,34 +262,32 @@ def goals(request):
         'form': form
     })
 
+
 @login_required
 def update_goal_progress(request, goal_id):
     if request.method == 'POST':
         try:
             goal = get_object_or_404(FinancialGoal, id=goal_id, user=request.user)
-            data = json.loads(request.body)
-            amount = Decimal(str(data.get('amount', 0)))
+            amount = Decimal(request.POST.get('amount', '0'))
 
-            goal.current_amount = goal.current_amount + amount
-
-            # Sprawdź czy cel został osiągnięty
-            if goal.current_amount >= goal.target_amount:
-                goal.archived = True
-                goal.achieved_date = timezone.now()
-
+            # Aktualizujemy kwotę
+            goal.current_amount += amount
             goal.save()
 
-            remaining = goal.get_remaining_amount()
-            progress = goal.get_progress_percentage()
+            goal_achieved = goal.check_if_achieved()
 
+            # Zwracamy zaktualizowane dane
             return JsonResponse({
                 'success': True,
                 'new_amount': float(goal.current_amount),
-                'remaining': float(remaining),
-                'progress': progress,
-                'goal_achieved': goal.archived
+                'progress': goal.get_progress_percentage(),
+                'remaining': float(goal.get_remaining_amount()),
+                'goal_achieved': goal_achieved,
+                'archived': goal.archived
             })
+
         except Exception as e:
+            print(f"Error updating goal: {str(e)}")  # Debugging
             return JsonResponse({
                 'success': False,
                 'error': str(e)
@@ -302,10 +300,27 @@ def delete_goal(request, goal_id):
         try:
             goal = get_object_or_404(FinancialGoal, id=goal_id, user=request.user)
             goal.delete()
+            print(f"Goal {goal_id} deleted successfully")  # Dodajemy debug
             return JsonResponse({'success': True})
         except Exception as e:
-            return JsonResponse({'success': False, 'error': str(e)}, status=400)
+            print(f"Error deleting goal: {str(e)}")  # Dodajemy debug
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            }, status=400)
     return JsonResponse({'success': False}, status=405)
+
+
+@login_required
+def achieved_goals(request):
+    achieved_goals = FinancialGoal.objects.filter(
+        user=request.user,
+        archived=True
+    ).order_by('-achieved_date')  # sortowanie od najnowszych
+
+    return render(request, 'expenses/achieved_goals.html', {
+        'achieved_goals': achieved_goals
+    })
 
 @login_required
 def reports(request):

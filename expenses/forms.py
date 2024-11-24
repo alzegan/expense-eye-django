@@ -124,6 +124,11 @@ class FinancialGoalForm(forms.ModelForm):
     class Meta:
         model = FinancialGoal
         fields = ['name', 'target_amount', 'deadline']
+        labels = {
+            'name': 'Cel',
+            'target_amount': 'Kwota',
+            'deadline': 'Termin realizacji'
+        }
         widgets = {
             'name': forms.TextInput(attrs={
                 'class': 'form-input',
@@ -140,3 +145,5 @@ class FinancialGoalForm(forms.ModelForm):
                 'type': 'date'
             })
         }
+
+

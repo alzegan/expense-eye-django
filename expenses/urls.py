@@ -16,6 +16,7 @@ urlpatterns = [
     path('goals/', views.goals, name='goals'),
     path('goals/<int:goal_id>/update/', views.update_goal_progress, name='update_goal_progress'),
     path('goals/<int:goal_id>/delete/', views.delete_goal, name='delete_goal'),
+    path('achieved_goals/', views.achieved_goals, name='achieved_goals'),
     path('reports/', views.reports, name='reports'),
     path('settings/', views.settings, name='settings'),
 ]

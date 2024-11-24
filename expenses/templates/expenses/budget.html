@@ -10,11 +10,11 @@
         </div>
 
         <nav class="sidebar-nav">
-            <a href="{% url 'dashboard' %}" class="nav-item active">
+            <a href="{% url 'dashboard' %}" class="nav-item">
                 <i data-lucide="home"></i>
                 Panel główny
             </a>
-            <a href="{% url 'budget' %}" class="nav-item">
+            <a href="{% url 'budget' %}" class="nav-item active">
                 <i data-lucide="wallet"></i>
                 Zarządzaj wydatkami
             </a>
@@ -29,6 +29,10 @@
             <a href="{% url 'reports' %}" class="nav-item">
                 <i data-lucide="chart-column"></i>
                 Raporty
+            </a>
+            <a href="{% url 'achieved_goals' %}" class="nav-item">
+                <i data-lucide="archive"></i>
+                Archiwum
             </a>
 
             <div class="sidebar-footer">

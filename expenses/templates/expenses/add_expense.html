@@ -2,63 +2,92 @@
 {% load static %}
 {% block content %}
 
-<div class="form-container">
-    <div class="form-card">
-        <div class="card-header">
-            <h2>Dodaj nowy wydatek</h2>
-            <div class="quick-tips">
-                Wypełnij poniższy formularz, aby dodać nowy wydatek
-            </div>
+<div class="layout">
+    <div class="sidebar">
+        <div class="logo">
+            <i data-lucide="eye-closed"></i>
+            ExpenseEye
         </div>
 
-        <form method="POST">
-            {% csrf_token %}
+        <nav class="sidebar-nav">
+            <a href="{% url 'dashboard' %}" class="nav-item active">
+                <i data-lucide="home"></i>
+                Panel główny
+            </a>
+            <a href="{% url 'delete_expense' %}" class="nav-item">
+                <i data-lucide="trash-2"></i>
+                Usuń wydatek
+            </a>
+            <a href="{% url 'modify_expense' %}" class="nav-item">
+                <i data-lucide="edit"></i>
+                Modyfikuj wydatek
+            </a>
+            <a href="{% url 'reports' %}" class="nav-item">
+                <i data-lucide="chart-column"></i>
+                Raporty
+            </a>
 
-            <div class="form-group">
-                <label>Kwota (zł)</label>
-                {{ form.amount }}
+            <div class="sidebar-footer">
+                <a href="{% url 'settings' %}" class="nav-item logout">
+                    <i data-lucide="settings"></i>
+                    Ustawienia
+                </a>
+                <a href="{% url 'login' %}" class="nav-item logout">
+                    <i data-lucide="log-out"></i>
+                    Wyloguj
+                </a>
             </div>
+        </nav>
+    </div>
 
-            <div class="form-group">
-                <label>Data</label>
-                {{ form.date }}
-            </div>
 
-            <div class="form-group">
-                <label>Metoda płatności</label>
-                {{ form.payment_method }}
-            </div>
-
-            <div class="form-group">
-                <label>Kategoria</label>
-                {{ form.category }}
-
-                <div id="new-category-wrapper" style="display: none; margin-top: 10px;">
-                    <label>Nazwa nowej kategorii</label>
-                    {{ form.new_category }}
+    <div class="form-container">
+        <div class="form-card">
+            <div class="card-header">
+                <h2>Dodaj nowy wydatek</h2>
+                <div class="quick-tips">
+                    Wypełnij poniższy formularz, aby dodać nowy wydatek
                 </div>
             </div>
 
-            <div class="form-group">
-                <label>Opis (opcjonalnie)</label>
-                {{ form.description }}
-            </div>
+            <form method="POST">
+                {% csrf_token %}
 
-            <div class="form-actions">
-                <button type="submit" class="submit-button">Dodaj wydatek</button>
-            </div>
-        </form>
-    </div>
-</div>
+                <div class="form-group">
+                    <label>Kwota (zł)</label>
+                    {{ form.amount }}
+                </div>
 
-<div class="bottom-navigation">
-    <div class="nav-item" onclick="location.href='{% url 'dashboard' %}'">
-        <i data-lucide="home"></i>
-        <span>Panel główny</span>
-    </div>
-    <div class="nav-item" onclick="location.href='{% url 'budget' %}'">
-        <i data-lucide="wallet"></i>
-        <span>Zarządzaj wydatkami</span>
+                <div class="form-group">
+                    <label>Data</label>
+                    {{ form.date }}
+                </div>
+
+                <div class="form-group">
+                    <label>Metoda płatności</label>
+                    {{ form.payment_method }}
+                </div>
+
+                <div class="form-group">
+                    <label>Kategoria</label>
+                    {{ form.category }}
+
+                    <div id="new-category-wrapper" style="display: none; margin-top: 10px;">
+                        <label>Nazwa nowej kategorii</label>
+                        {{ form.new_category }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Opis (opcjonalnie)</label>
+                    {{ form.description }}
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="submit-button">Dodaj wydatek</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 

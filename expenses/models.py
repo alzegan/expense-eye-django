@@ -39,12 +39,23 @@ class FinancialGoal(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     archived = models.BooleanField(default=False)
     achieved_date = models.DateTimeField(null=True, blank=True)
+
     def get_progress_percentage(self):
-        return int((self.current_amount / self.target_amount) * 100)
+        if self.target_amount <= 0:
+            return 0
+        progress = (self.current_amount / self.target_amount) * 100
+        return min(progress, 100)
 
     def get_remaining_amount(self):
         return self.target_amount - self.current_amount
 
+    def check_if_achieved(self):
+        if not self.archived and self.current_amount >= self.target_amount:
+            self.archived = True
+            self.achieved_date = timezone.now()
+            self.save()
+            return True
+        return False
     def archive_if_achieved(self):
         if not self.archived and self.current_amount >= self.target_amount:
             self.archived = True
