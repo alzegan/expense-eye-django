@@ -1,18 +1,23 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth import login
+from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
+from django.contrib.auth import login, update_session_auth_hash
 from .models import Expense, Category, FinancialGoal
 from expenses.forms import ExpenseFilterForm
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
-from .forms import ExpenseForm, UserRegistrationForm, ExpenseFilterForm, FinancialGoalForm
+from .forms import ExpenseForm, UserRegistrationForm, ExpenseFilterForm, FinancialGoalForm, UserUpdateForm
 from django.db.models import Sum, Q
 from django.utils import timezone
 from django.http import JsonResponse
 from decimal import Decimal
+from django.contrib import messages
 from datetime import datetime
 import json
-
+from django.views.generic import TemplateView
+from django.db.models import Sum, Avg, Max, Count
+from django.db.models.functions import TruncDate
+from datetime import datetime, timedelta
+from django.utils.decorators import method_decorator
 
 MONTHS_PL = {
     1: 'Styczeń',
@@ -238,8 +243,6 @@ def filters(request):
         'expenses': expenses,
         'form': form
     })
-
-
 @login_required
 def goals(request):
     user_goals = FinancialGoal.objects.filter(
@@ -262,15 +265,12 @@ def goals(request):
         'form': form
     })
 
-
 @login_required
 def update_goal_progress(request, goal_id):
-    if request.method == 'POST':
+    if request.method == 'POST' or 'GET':
         try:
             goal = get_object_or_404(FinancialGoal, id=goal_id, user=request.user)
             amount = Decimal(request.POST.get('amount', '0'))
-
-            # Aktualizujemy kwotę
             goal.current_amount += amount
             goal.save()
 
@@ -322,11 +322,135 @@ def achieved_goals(request):
         'achieved_goals': achieved_goals
     })
 
-@login_required
-def reports(request):
-    return render(request, 'expenses/reports.html')
+@method_decorator(login_required, name='dispatch')
+class ReportView(TemplateView):
+    template_name = 'expenses/reports.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Pobierz parametry filtrowania
+        period = int(self.request.GET.get('period', 30))
+        category_id = self.request.GET.get('category')
+
+        # Określ zakres dat
+        end_date = timezone.now()
+        start_date = end_date - timedelta(days=period)
+
+        # Podstawowe zapytanie
+        expenses = Expense.objects.filter(
+            user=self.request.user,
+            date__range=(start_date, end_date)
+        )
+
+        if category_id:
+            expenses = expenses.filter(category_id=category_id)
+
+        # Oblicz podstawowe statystyki
+        stats = expenses.aggregate(
+            total_expenses=Sum('amount'),
+            max_expense=Max('amount')
+        )
+
+        total = stats['total_expenses'] or Decimal('0')
+        avg_daily = total / period if total > 0 else Decimal('0')
+
+        # Przygotuj podsumowanie kategorii
+        categories = Category.objects.filter(
+            expense__user=self.request.user
+        ).distinct()
+
+        category_summary = []
+        for cat in categories:
+            cat_expenses = expenses.filter(category=cat)
+            cat_total = cat_expenses.aggregate(total=Sum('amount'))['total'] or Decimal('0')
+
+            if total > 0:
+                percentage = (cat_total / total * 100).quantize(Decimal('0.1'))
+            else:
+                percentage = Decimal('0')
+
+            category_summary.append({
+                'name': cat.name,
+                'total': cat_total,
+                'percentage': percentage,
+                'count': cat_expenses.count()
+            })
+
+        context.update({
+            'categories': categories,
+            'total_expenses': stats['total_expenses'] or 0,
+            'max_expense': stats['max_expense'] or 0,
+            'avg_daily': round(avg_daily, 2),
+            'category_summary': category_summary,
+            'expenses': expenses.order_by('-date')[:50],
+            'selected_period': period,
+            'selected_category': category_id,
+        })
+
+        return context
+
+
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
+from .forms import UserUpdateForm
+from .models import Profile
+from django.core.exceptions import ObjectDoesNotExist
 
 @login_required
 def settings(request):
-    return render(request, 'expenses/settings.html')
+    # Sprawdzanie czy użytkownik ma profil, jeśli nie - utworzenie go
+    try:
+        profile = request.user.profile
+    except ObjectDoesNotExist:
+        profile = Profile.objects.create(user=request.user)
+
+    if request.method == 'POST':
+        # Obsługa zdjęcia profilowego
+        if 'profile_image' in request.FILES:
+            try:
+                profile.image = request.FILES['profile_image']
+                profile.save()
+                messages.success(request, 'Zdjęcie profilowe zostało zaktualizowane!')
+            except Exception as e:
+                messages.error(request, 'Wystąpił błąd podczas aktualizacji zdjęcia.')
+            return redirect('account_settings')
+
+        # Aktualizacja danych profilu
+        if 'update_profile' in request.POST:
+            user_form = UserUpdateForm(request.POST, instance=request.user)
+            if user_form.is_valid():
+                user_form.save()
+                messages.success(request, 'Twój profil został zaktualizowany!')
+                return redirect('account_settings')
+            else:
+                messages.error(request, 'Wystąpił błąd podczas aktualizacji profilu.')
+
+        # Zmiana hasła
+        elif 'change_password' in request.POST:
+            password_form = PasswordChangeForm(request.user, request.POST)
+            if password_form.is_valid():
+                user = password_form.save()
+                update_session_auth_hash(request, user)  # Zachowanie sesji użytkownika
+                messages.success(request, 'Twoje hasło zostało zmienione!')
+                return redirect('account_settings')
+            else:
+                messages.error(request, 'Wystąpił błąd podczas zmiany hasła.')
+                return render(request, 'expenses/account_settings.html', {
+                    'user_form': UserUpdateForm(instance=request.user),
+                    'password_form': password_form,  # Zwracamy formularz z błędami
+                })
+
+    else:
+        user_form = UserUpdateForm(instance=request.user)
+        password_form = PasswordChangeForm(request.user)
+
+    context = {
+        'user_form': user_form,
+        'password_form': password_form,
+    }
+
+    return render(request, 'expenses/account_settings.html', context)

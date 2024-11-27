@@ -2,6 +2,7 @@ from django import forms
 from .models import Expense, Category, FinancialGoal
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from django.contrib.auth.forms import PasswordChangeForm
 from django.utils import timezone
 
 
@@ -146,4 +147,30 @@ class FinancialGoalForm(forms.ModelForm):
             })
         }
 
+
+class UserUpdateForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'email']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['first_name'].widget.attrs.update({
+            'class': 'form-input',
+            'placeholder': 'Wprowadź imię'
+        })
+        self.fields['last_name'].widget.attrs.update({
+            'class': 'form-input',
+            'placeholder': 'Wprowadź nazwisko'
+        })
+        self.fields['email'].widget.attrs.update({
+            'class': 'form-input',
+            'placeholder': 'Wprowadź email'
+        })
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.exclude(pk=self.instance.pk).filter(email=email).exists():
+            raise forms.ValidationError('Ten adres email jest już zajęty.')
+        return email
 

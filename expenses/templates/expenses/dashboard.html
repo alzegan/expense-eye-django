@@ -35,7 +35,7 @@
         </a>
 
         <div class="sidebar-footer">
-            <a href="{% url 'settings' %}" class="nav-item">
+            <a href="{% url 'account_settings' %}" class="nav-item">
                 <i data-lucide="settings"></i>
                 Ustawienia
             </a>
@@ -109,7 +109,7 @@
                                         </div>
                                         <div class="progress-values">
                                             <span>{{ goal.current_amount|floatformat:2 }} zł</span>
-                                            <span>Cel: {{ goal.target_amount|floatformat:2 }} zł</span>
+                                            <span>{{ goal.target_amount|floatformat:2 }} zł</span>
                                         </div>
                                     </div>
                                 </div>
