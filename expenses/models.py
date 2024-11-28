@@ -13,14 +13,17 @@ class Profile(models.Model):
     def __str__(self):
         return f'{self.user.username} Profile'
 
+
 @receiver(post_save, sender=User)
 def create_profile(sender, instance, created, **kwargs):
     if created:
         Profile.objects.create(user=instance)
 
+
 @receiver(post_save, sender=User)
 def save_profile(sender, instance, **kwargs):
     instance.profile.save()
+
 
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -65,7 +68,6 @@ class FinancialGoal(models.Model):
         progress = (self.current_amount / self.target_amount) * Decimal('100')
         return min(progress, Decimal('100'))
 
-
     def get_remaining_amount(self):
         return self.target_amount - self.current_amount
 
@@ -76,6 +78,7 @@ class FinancialGoal(models.Model):
             self.save()
             return True
         return False
+
     def archive_if_achieved(self):
         if not self.archived and self.current_amount >= self.target_amount:
             self.archived = True

@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="layout">
+    <div class="sidebar">
+        <div class="logo">
+            <i data-lucide="eye-closed"></i>
+            ExpenseEye
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="{% url 'dashboard' %}" class="nav-item">
+                <i data-lucide="home"></i>
+                Panel główny
+            </a>
+            <a href="{% url 'budget' %}" class="nav-item">
+                <i data-lucide="wallet"></i>
+                Zarządzaj wydatkami
+            </a>
+            <a href="{% url 'filters' %}" class="nav-item">
+                <i data-lucide="search"></i>
+                Szukaj
+            </a>
+            <a href="{% url 'goals' %}" class="nav-item">
+                <i data-lucide="target"></i>
+                Cele
+            </a>
+            <a href="{% url 'reports' %}" class="nav-item">
+                <i data-lucide="chart-column"></i>
+                Raporty
+            </a>
+            <a href="{% url 'achieved_goals' %}" class="nav-item">
+                <i data-lucide="archive"></i>
+                Archiwum
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="{% url 'account_settings' %}" class="nav-item active">
+                <i data-lucide="settings"></i>
+                Ustawienia
+            </a>
+            <a href="{% url 'login' %}" class="nav-item">
+                <i data-lucide="log-out"></i>
+                Wyloguj
+            </a>
+        </div>
+    </div>
+
+    <div class="settings-container">
+        <div class="settings-header">
+            <h1>Ustawienia konta</h1>
+        </div>
+
+        <div class="settings-section">
+
+            <div class="settings-card profile-card">
+                <form method="POST" enctype="multipart/form-data" class="profile-form">
+                    {% csrf_token %}
+                    <div class="profile-image-container">
+                        {% if user.profile.image %}
+                            <img src="{{ user.profile.image.url }}" alt="Zdjęcie profilowe" class="profile-image">
+                        {% else %}
+                            <div class="profile-image-placeholder">
+                                <i data-lucide="user" size="64"></i>
+                            </div>
+                        {% endif %}
+                        <label for="id_profile_image" class="image-upload-label">
+                            <i data-lucide="camera"></i>
+                            Wybierz zdjęcie
+                        </label>
+                        <input type="file" id="id_profile_image" name="profile_image" accept="image/*">
+                    </div>
+                    <div class="profile-info">
+                        <p class="profile-email">{{ user.email }}</p>
+                    </div>
+                </form>
+            </div>
+
+            <div class="settings-card">
+                <h2>Dane osobowe</h2>
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="id_first_name">Imię</label>
+                        {{ user_form.first_name }}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_last_name">Nazwisko</label>
+                        {{ user_form.last_name }}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_email">Email</label>
+                        {{ user_form.email }}
+                    </div>
+                    <button type="submit" name="update_profile" class="btn-primary">
+                        <i data-lucide="save"></i>
+                        Zapisz zmiany
+                    </button>
+                </form>
+            </div>
+
+            <div class="settings-card">
+                <h2>Zmiana hasła</h2>
+                <form method="POST">
+                    {% csrf_token %}
+                    {% for field in password_form %}
+                        <div class="form-group">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                                <div class="error-message">
+                                    {{ field.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    <button type="submit" name="change_password" class="btn-primary">
+                        <i data-lucide="key"></i>
+                        Zmień hasło
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    const messages = document.querySelectorAll('.alert');
+    messages.forEach(function(message) {
+        setTimeout(function() {
+            message.remove();
+        }, 3500);
+    });
+
+
+    document.getElementById('id_profile_image').addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            this.closest('form').submit();
+        }
+    });
+});
+</script>
+{% endblock %}

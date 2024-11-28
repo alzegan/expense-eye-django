@@ -2,123 +2,123 @@
 {% load static %}
 {% block content %}
 
-<div class="layout">
-    <div class="sidebar">
-        <div class="logo">
-            <i data-lucide="eye-closed"></i>
-            ExpenseEye
+    <div class="layout">
+        <div class="sidebar">
+            <div class="logo">
+                <i data-lucide="eye-closed"></i>
+                ExpenseEye
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="{% url 'dashboard' %}" class="nav-item">
+                    <i data-lucide="home"></i>
+                    Panel główny
+                </a>
+                <a href="{% url 'budget' %}" class="nav-item">
+                    <i data-lucide="wallet"></i>
+                    Zarządzaj wydatkami
+                </a>
+                <a href="{% url 'filters' %}" class="nav-item">
+                    <i data-lucide="search"></i>
+                    Szukaj
+                </a>
+                <a href="{% url 'goals' %}" class="nav-item">
+                    <i data-lucide="target"></i>
+                    Cele
+                </a>
+                <a href="{% url 'reports' %}" class="nav-item active">
+                    <i data-lucide="chart-column"></i>
+                    Raporty
+                </a>
+                <a href="{% url 'achieved_goals' %}" class="nav-item">
+                    <i data-lucide="archive"></i>
+                    Archiwum
+                </a>
+
+                <div class="sidebar-footer">
+                    <a href="{% url 'account_settings' %}" class="nav-item logout">
+                        <i data-lucide="settings"></i>
+                        Ustawienia
+                    </a>
+                    <a href="{% url 'login' %}" class="nav-item logout">
+                        <i data-lucide="log-out"></i>
+                        Wyloguj
+                    </a>
+                </div>
+            </nav>
         </div>
 
-        <nav class="sidebar-nav">
-            <a href="{% url 'dashboard' %}" class="nav-item">
-                <i data-lucide="home"></i>
-                Panel główny
-            </a>
-            <a href="{% url 'budget' %}" class="nav-item">
-                <i data-lucide="wallet"></i>
-                Zarządzaj wydatkami
-            </a>
-            <a href="{% url 'filters' %}" class="nav-item">
-                <i data-lucide="search"></i>
-                Szukaj
-            </a>
-            <a href="{% url 'goals' %}" class="nav-item">
-                <i data-lucide="target"></i>
-                Cele
-            </a>
-            <a href="{% url 'reports' %}" class="nav-item active">
-                <i data-lucide="chart-column"></i>
-                Raporty
-            </a>
-            <a href="{% url 'achieved_goals' %}" class="nav-item">
-                <i data-lucide="archive"></i>
-                Archiwum
-            </a>
+        <div class="main-content">
+            <div class="reports-container">
+                <div class="report-card">
+                    <div class="filters-header">
+                        <h2>Raporty finansowe</h2>
 
-            <div class="sidebar-footer">
-                <a href="{% url 'account_settings' %}" class="nav-item logout">
-                    <i data-lucide="settings"></i>
-                    Ustawienia
-                </a>
-                <a href="{% url 'login' %}" class="nav-item logout">
-                    <i data-lucide="log-out"></i>
-                    Wyloguj
-                </a>
-            </div>
-        </nav>
-    </div>
+                        <form method="GET" class="filters-form">
+                            <div class="filter-group">
+                                <label>Okres:</label>
+                                <select name="period" class="filter-input">
+                                    <option value="7">Ostatni tydzień</option>
+                                    <option value="30">Ostatni miesiąc</option>
+                                    <option value="90">Ostatnie 3 miesiące</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label>Kategoria:</label>
+                                <select name="category" class="filter-input">
+                                    <option value="">Wszystkie kategorie</option>
+                                    {% for category in categories %}
+                                        <option value="{{ category.id }}">{{ category.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <button type="submit" class="generate-report">
+                                Generuj raport
+                            </button>
+                        </form>
+                    </div>
 
-    <div class="main-content">
-        <div class="reports-container">
-            <div class="report-card">
-                <div class="filters-header">
-                    <h2>Raporty finansowe</h2>
 
-                    <form method="GET" class="filters-form">
-                        <div class="filter-group">
-                            <label>Okres:</label>
-                            <select name="period" class="filter-input">
-                                <option value="7">Ostatni tydzień</option>
-                                <option value="30">Ostatni miesiąc</option>
-                                <option value="90">Ostatnie 3 miesiące</option>
-                            </select>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-title">Suma wydatków</div>
+                            <div class="stat-value">{{ total_expenses }} PLN</div>
                         </div>
-                        <div class="filter-group">
-                            <label>Kategoria:</label>
-                            <select name="category" class="filter-input">
-                                <option value="">Wszystkie kategorie</option>
-                                {% for category in categories %}
-                                    <option value="{{ category.id }}">{{ category.name }}</option>
-                                {% endfor %}
-                            </select>
+                        <div class="stat-card">
+                            <div class="stat-title">Średni dzienny wydatek</div>
+                            <div class="stat-value">{{ avg_daily }} PLN</div>
                         </div>
-                        <button type="submit" class="generate-report">
-                            Generuj raport
-                        </button>
-                    </form>
-                </div>
+                        <div class="stat-card">
+                            <div class="stat-title">Największy wydatek</div>
+                            <div class="stat-value">{{ max_expense }} PLN</div>
+                        </div>
+                    </div>
 
-                <!-- Statystyki -->
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-title">Suma wydatków</div>
-                        <div class="stat-value">{{ total_expenses }} PLN</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-title">Średni dzienny wydatek</div>
-                        <div class="stat-value">{{ avg_daily }} PLN</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-title">Największy wydatek</div>
-                        <div class="stat-value">{{ max_expense }} PLN</div>
-                    </div>
-                </div>
 
-                <!-- Tabela wydatków -->
-                <div class="table-responsive">
-                    <table class="expenses-table">
-                        <thead>
+                    <div class="table-responsive">
+                        <table class="expenses-table">
+                            <thead>
                             <tr>
                                 <th>Data</th>
                                 <th>Kategoria</th>
                                 <th>Opis</th>
                                 <th>Kwota</th>
                             </tr>
-                        </thead>
-                        <tbody>
+                            </thead>
+                            <tbody>
                             {% for expense in expenses %}
-                            <tr>
-                                <td>{{ expense.date|date:"d.m.Y" }}</td>
-                                <td>{{ expense.category.name }}</td>
-                                <td>{{ expense.description }}</td>
-                                <td>{{ expense.amount }} PLN</td>
-                            </tr>
+                                <tr>
+                                    <td>{{ expense.date|date:"d.m.Y" }}</td>
+                                    <td>{{ expense.category.name }}</td>
+                                    <td>{{ expense.description }}</td>
+                                    <td>{{ expense.amount }} PLN</td>
+                                </tr>
                             {% endfor %}
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 {% endblock %}

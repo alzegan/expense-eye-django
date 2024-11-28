@@ -1,11 +1,11 @@
-/* Kontener raportów */
+
 .reports-container {
     padding: 20px;
     max-width: 1200px;
     margin: 0 auto;
 }
 
-/* Karta raportu */
+
 .report-card {
     background: rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(10px);
@@ -15,7 +15,6 @@
     margin-bottom: 24px;
 }
 
-/* Nagłówek filtrów */
 .filters-header {
     margin-bottom: 30px;
 }
@@ -53,7 +52,6 @@
     box-shadow: 0 0 0 2px rgba(47, 65, 81, 0.1);
 }
 
-/* Statystyki */
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -80,7 +78,7 @@
     font-weight: 600;
 }
 
-/* Tabela wydatków */
+
 .expenses-table {
     width: 100%;
     border-collapse: separate;
@@ -109,7 +107,7 @@
     border-radius: 0 8px 8px 0;
 }
 
-/* Przycisk generowania raportu */
+
 .generate-report {
     display: inline-flex;
     align-items: center;
@@ -128,7 +126,7 @@
     transform: translateY(-1px);
 }
 
-/* Responsywność */
+
 @media (max-width: 768px) {
     .report-card {
         padding: 20px;

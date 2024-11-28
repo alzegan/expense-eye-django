@@ -78,8 +78,9 @@ class ExpenseForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        categories = Category.objects.all().order_by('name')  # Dodano order_by
-        self.fields['category'].choices = [('', '--------')] + [(c.id, c.name) for c in categories] + [('new', 'Dodaj inną kategorię...')]
+        categories = Category.objects.all().order_by('name')
+        self.fields['category'].choices = [('', '--------')] + [(c.id, c.name) for c in categories] + [
+            ('new', 'Dodaj inną kategorię...')]
         self.fields['date'].input_formats = ['%Y-%m-%d']
         self.fields['date'].initial = timezone.now().strftime('%Y-%m-%d')
         self.fields['description'].required = False
@@ -96,6 +97,7 @@ class CategoryForm(forms.ModelForm):
     class Meta:
         model = Category
         fields = ['name']
+
 
 class ExpenseFilterForm(forms.Form):
     min_amount = forms.DecimalField(required=False, label="Minimalna kwota")
@@ -120,6 +122,7 @@ class ExpenseFilterForm(forms.Form):
         required=False,
         label="Opis zawiera"
     )
+
 
 class FinancialGoalForm(forms.ModelForm):
     class Meta:
@@ -173,4 +176,3 @@ class UserUpdateForm(forms.ModelForm):
         if User.objects.exclude(pk=self.instance.pk).filter(email=email).exists():
             raise forms.ValidationError('Ten adres email jest już zajęty.')
         return email
-

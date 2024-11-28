@@ -1,23 +1,29 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
+from django.contrib.auth.models import User
 from django.contrib.auth import login, update_session_auth_hash
-from .models import Expense, Category, FinancialGoal
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail
+from django.urls import reverse
+from django.template.loader import render_to_string
+from .models import Expense, Category, FinancialGoal, Profile
 from expenses.forms import ExpenseFilterForm
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from .forms import ExpenseForm, UserRegistrationForm, ExpenseFilterForm, FinancialGoalForm, UserUpdateForm
-from django.db.models import Sum, Q
+from django.db.models import Q, Sum, Avg, Max, Count
 from django.utils import timezone
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
 from django.http import JsonResponse
 from decimal import Decimal
 from django.contrib import messages
-from datetime import datetime
 import json
 from django.views.generic import TemplateView
-from django.db.models import Sum, Avg, Max, Count
 from django.db.models.functions import TruncDate
 from datetime import datetime, timedelta
 from django.utils.decorators import method_decorator
+from django.core.exceptions import ObjectDoesNotExist
 
 MONTHS_PL = {
     1: 'Styczeń',
@@ -34,7 +40,11 @@ MONTHS_PL = {
     12: 'Grudzień'
 }
 
+
 def home(request):
+    storage = messages.get_messages(request)
+    storage.used = True
+
     if request.method == 'POST':
         form = AuthenticationForm(data=request.POST)
         if form.is_valid():
@@ -42,7 +52,7 @@ def home(request):
             login(request, user)
             return redirect('dashboard')
         else:
-            return render(request, 'login_page.html', {'form': form})
+            messages.error(request, 'Nieprawidłowa nazwa użytkownika lub hasło.')
     else:
         form = AuthenticationForm()
         form.fields['username'].widget.attrs.update({
@@ -67,6 +77,7 @@ def user_register(request):
     else:
         form = UserRegistrationForm()
     return render(request, 'register_page.html', {'form': form})
+
 
 @login_required
 def dashboard(request):
@@ -113,6 +124,7 @@ def dashboard(request):
     response['Expires'] = '0'
     return response
 
+
 @login_required
 def budget(request):
     return render(request, 'expenses/budget.html')
@@ -148,10 +160,12 @@ def add_expense(request):
 
     return render(request, 'expenses/add_expense.html', {'form': form})
 
+
 @login_required
 def delete_expense(request):
     expenses = Expense.objects.filter(user=request.user).order_by('-date')
     return render(request, 'expenses/delete_expense.html', {'expenses': expenses})
+
 
 @login_required
 def delete_expense_confirm(request, expense_id):
@@ -164,6 +178,7 @@ def delete_expense_confirm(request, expense_id):
             return JsonResponse({'success': False, 'error': str(e)}, status=400)
     return JsonResponse({'success': False, 'error': 'Invalid method'}, status=405)
 
+
 @login_required
 def modify_expense(request):
     expenses = Expense.objects.filter(user=request.user).order_by('-date')
@@ -172,6 +187,7 @@ def modify_expense(request):
         'expenses': expenses,
         'categories': categories
     })
+
 
 @login_required
 def get_expense(request, expense_id):
@@ -189,8 +205,9 @@ def get_expense(request, expense_id):
             'error': str(e)
         }, status=400)
 
+
 @login_required
-@csrf_exempt  # Tymczasowo dla testów
+@csrf_exempt
 def modify_expense_confirm(request, expense_id):
     if request.method == 'POST':
         try:
@@ -208,7 +225,7 @@ def modify_expense_confirm(request, expense_id):
                 'message': 'Wydatek został zaktualizowany'
             })
         except Exception as e:
-            print(f"Error: {str(e)}")  # Debug
+            print(f"Error: {str(e)}")
             return JsonResponse({
                 'success': False,
                 'message': 'Wystąpił błąd podczas modyfikacji wydatku',
@@ -219,6 +236,7 @@ def modify_expense_confirm(request, expense_id):
         'success': False,
         'message': 'Nieprawidłowa metoda'
     }, status=405)
+
 
 @login_required
 def filters(request):
@@ -243,6 +261,8 @@ def filters(request):
         'expenses': expenses,
         'form': form
     })
+
+
 @login_required
 def goals(request):
     user_goals = FinancialGoal.objects.filter(
@@ -265,6 +285,7 @@ def goals(request):
         'form': form
     })
 
+
 @login_required
 def update_goal_progress(request, goal_id):
     if request.method == 'POST' or 'GET':
@@ -276,7 +297,6 @@ def update_goal_progress(request, goal_id):
 
             goal_achieved = goal.check_if_achieved()
 
-            # Zwracamy zaktualizowane dane
             return JsonResponse({
                 'success': True,
                 'new_amount': float(goal.current_amount),
@@ -287,12 +307,13 @@ def update_goal_progress(request, goal_id):
             })
 
         except Exception as e:
-            print(f"Error updating goal: {str(e)}")  # Debugging
+            print(f"Error updating goal: {str(e)}")
             return JsonResponse({
                 'success': False,
                 'error': str(e)
             }, status=400)
     return JsonResponse({'success': False}, status=405)
+
 
 @login_required
 def delete_goal(request, goal_id):
@@ -300,10 +321,10 @@ def delete_goal(request, goal_id):
         try:
             goal = get_object_or_404(FinancialGoal, id=goal_id, user=request.user)
             goal.delete()
-            print(f"Goal {goal_id} deleted successfully")  # Dodajemy debug
+            print(f"Goal {goal_id} deleted successfully")
             return JsonResponse({'success': True})
         except Exception as e:
-            print(f"Error deleting goal: {str(e)}")  # Dodajemy debug
+            print(f"Error deleting goal: {str(e)}")
             return JsonResponse({
                 'success': False,
                 'error': str(e)
@@ -316,11 +337,11 @@ def achieved_goals(request):
     achieved_goals = FinancialGoal.objects.filter(
         user=request.user,
         archived=True
-    ).order_by('-achieved_date')  # sortowanie od najnowszych
-
+    ).order_by('-achieved_date')
     return render(request, 'expenses/achieved_goals.html', {
         'achieved_goals': achieved_goals
     })
+
 
 @method_decorator(login_required, name='dispatch')
 class ReportView(TemplateView):
@@ -329,15 +350,12 @@ class ReportView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # Pobierz parametry filtrowania
         period = int(self.request.GET.get('period', 30))
         category_id = self.request.GET.get('category')
 
-        # Określ zakres dat
         end_date = timezone.now()
         start_date = end_date - timedelta(days=period)
 
-        # Podstawowe zapytanie
         expenses = Expense.objects.filter(
             user=self.request.user,
             date__range=(start_date, end_date)
@@ -346,7 +364,6 @@ class ReportView(TemplateView):
         if category_id:
             expenses = expenses.filter(category_id=category_id)
 
-        # Oblicz podstawowe statystyki
         stats = expenses.aggregate(
             total_expenses=Sum('amount'),
             max_expense=Max('amount')
@@ -355,7 +372,6 @@ class ReportView(TemplateView):
         total = stats['total_expenses'] or Decimal('0')
         avg_daily = total / period if total > 0 else Decimal('0')
 
-        # Przygotuj podsumowanie kategorii
         categories = Category.objects.filter(
             expense__user=self.request.user
         ).distinct()
@@ -391,25 +407,14 @@ class ReportView(TemplateView):
         return context
 
 
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import PasswordChangeForm
-from django.contrib.auth import update_session_auth_hash
-from .forms import UserUpdateForm
-from .models import Profile
-from django.core.exceptions import ObjectDoesNotExist
-
 @login_required
 def settings(request):
-    # Sprawdzanie czy użytkownik ma profil, jeśli nie - utworzenie go
     try:
         profile = request.user.profile
     except ObjectDoesNotExist:
         profile = Profile.objects.create(user=request.user)
 
     if request.method == 'POST':
-        # Obsługa zdjęcia profilowego
         if 'profile_image' in request.FILES:
             try:
                 profile.image = request.FILES['profile_image']
@@ -419,7 +424,6 @@ def settings(request):
                 messages.error(request, 'Wystąpił błąd podczas aktualizacji zdjęcia.')
             return redirect('account_settings')
 
-        # Aktualizacja danych profilu
         if 'update_profile' in request.POST:
             user_form = UserUpdateForm(request.POST, instance=request.user)
             if user_form.is_valid():
@@ -429,19 +433,18 @@ def settings(request):
             else:
                 messages.error(request, 'Wystąpił błąd podczas aktualizacji profilu.')
 
-        # Zmiana hasła
         elif 'change_password' in request.POST:
             password_form = PasswordChangeForm(request.user, request.POST)
             if password_form.is_valid():
                 user = password_form.save()
-                update_session_auth_hash(request, user)  # Zachowanie sesji użytkownika
+                update_session_auth_hash(request, user)
                 messages.success(request, 'Twoje hasło zostało zmienione!')
                 return redirect('account_settings')
             else:
                 messages.error(request, 'Wystąpił błąd podczas zmiany hasła.')
                 return render(request, 'expenses/account_settings.html', {
                     'user_form': UserUpdateForm(instance=request.user),
-                    'password_form': password_form,  # Zwracamy formularz z błędami
+                    'password_form': password_form,
                 })
 
     else:
@@ -454,3 +457,53 @@ def settings(request):
     }
 
     return render(request, 'expenses/account_settings.html', context)
+
+
+def password_reset(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        user = User.objects.filter(email=email).first()
+
+        if user:
+            token = default_token_generator.make_token(user)
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+
+            reset_url = request.build_absolute_uri(
+                reverse('password_reset_confirm', kwargs={'uidb64': uid, 'token': token})
+            )
+
+            subject = 'Reset hasła - ExpenseEye'
+            message = render_to_string('reset_password_email.html', {
+                'user': user,
+                'reset_url': reset_url
+            })
+
+            send_mail(subject, message, 'noreply@expenseeye.com', [email])
+            messages.success(request, 'Link do resetowania hasła został wysłany na podany adres email.')
+        else:
+            messages.error(request, 'Nie znaleziono użytkownika o podanym adresie email.')
+
+    return render(request, 'password_reset.html')
+
+
+def password_reset_confirm(request, uidb64, token):
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+
+        if request.method == 'POST':
+            password = request.POST.get('new_password')
+            if password:
+                user.set_password(password)
+                user.save()
+                messages.success(request, 'Hasło zostało zmienione.')
+                return redirect('login')
+
+        if default_token_generator.check_token(user, token):
+            return render(request, 'password_reset_confirm.html')
+
+    except:
+        pass
+
+    messages.error(request, 'Link do resetowania hasła jest nieprawidłowy.')
+    return redirect('login')

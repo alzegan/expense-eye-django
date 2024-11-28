@@ -1,0 +1,140 @@
+{% extends 'base.html' %} 
+{% load static %} 
+{% block content %}
+
+<div class="layout">
+    <div class="sidebar">
+        <div class="sidebar-content">
+            <div class="logo">
+                <i data-lucide="eye-closed"></i>
+                ExpenseEye
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="{% url 'dashboard' %}" class="nav-item">
+                    <i data-lucide="home"></i>
+                    Panel główny
+                </a>
+                <a href="{% url 'budget' %}" class="nav-item">
+                    <i data-lucide="wallet"></i>
+                    Zarządzaj wydatkami
+                </a>
+                <a href="{% url 'filters' %}" class="nav-item">
+                    <i data-lucide="search"></i>
+                    Szukaj
+                </a>
+                <a href="{% url 'goals' %}" class="nav-item">
+                    <i data-lucide="target"></i>
+                    Cele
+                </a>
+                <a href="{% url 'reports' %}" class="nav-item">
+                    <i data-lucide="chart-column"></i>
+                    Raporty
+                </a>
+                <a href="{% url 'achieved_goals' %}" class="nav-item active">
+                    <i data-lucide="archive"></i>
+                    Archiwum
+                </a>
+            </nav>
+        </div>
+
+        <footer class="sidebar-footer">
+            <a href="{% url 'account_settings' %}" class="nav-item">
+                <i data-lucide="settings"></i>
+                Ustawienia
+            </a>
+            <a href="{% url 'login' %}" class="nav-item">
+                <i data-lucide="log-out"></i>
+                Wyloguj
+            </a>
+        </footer>
+    </div>
+
+    <div class="archive-container">
+        <div class="archive-card">
+            <div class="archive-header">
+                <h2>Osiągnięte cele</h2>
+            </div>
+
+            <div class="archive-actions">
+                <select class="sort-select" id="sortSelect">
+                    <option value="date-desc">Od najnowszych</option>
+                    <option value="date-asc">Od najstarszych</option>
+                    <option value="amount-desc">Od najwyższej kwoty</option>
+                    <option value="amount-asc">Od najniższej kwoty</option>
+                </select>
+                <a href="{% url 'goals' %}" class="return-btn">Wróć do celów</a>
+            </div>
+
+            {% if achieved_goals %}
+                <div class="achieved-goals-list">
+                    {% for goal in achieved_goals %}
+                        <div class="archived-goal-item">
+                            <div class="archived-goal-header">
+                                <h3 class="archived-goal-name">{{ goal.name }}</h3>
+                                <span class="archived-goal-date">
+                                    Data osiągnięcia: {{ goal.achieved_date|date:"d.m.Y" }}
+                                </span>
+                            </div>
+
+                            <div class="archived-goal-details">
+                                <div class="archived-goal-stat">
+                                    <span class="stat-label">Kwota celu:</span>
+                                    <span class="stat-value">{{ goal.target_amount }} zł</span>
+                                </div>
+
+                                <div class="archived-goal-stat">
+                                    <span class="stat-label">Termin:</span>
+                                    <span class="stat-value">{{ goal.deadline|date:"d.m.Y" }}</span>
+                                </div>
+
+                                <div class="archived-goal-stat">
+                                    <span class="stat-label">Czas realizacji:</span>
+                                    <span class="stat-value">{{ goal.get_achievement_time }} dni</span>
+                                </div>
+                            </div>
+
+                            <div class="archived-goal-status">
+                                {% if goal.deadline >= goal.achieved_date.date %}
+                                    <span class="success-status">✓ Osiągnięto przed terminem!</span>
+                                {% else %}
+                                    <span class="delayed-status">⏰ Osiągnięto po terminie</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-goals">
+                    <div class="empty-message">
+                        Nie masz jeszcze osiągniętych celów
+                    </div>
+                    <a href="{% url 'goals' %}" class="return-btn">Wróć do celów</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const sortSelect = document.getElementById('sortSelect');
+
+    sortSelect.addEventListener('change', function() {
+        const selectedSort = this.value;
+        const currentUrl = new URL(window.location.href);
+        currentUrl.searchParams.set('sort', selectedSort);
+        window.location.href = currentUrl.toString();
+    });
+
+
+    const currentSort = '{{ current_sort }}';
+    if (currentSort) {
+        sortSelect.value = currentSort;
+    }
+});
+</script>
+{% endblock %}

@@ -1,4 +1,4 @@
-/* Kontener archiwum */
+
 .archive-container {
     flex: 1;
     display: flex;
@@ -37,7 +37,7 @@
     margin-bottom: 20px;
 }
 
-/* Lista osiągniętych celów */
+
 .achieved-goals-list {
     margin-top: 20px;
 }
@@ -95,7 +95,7 @@
     border-top: 1px solid rgba(47, 65, 81, 0.1);
 }
 
-/* Elementy kontrolne */
+
 .sort-select {
     padding: 12px;
     border: 1px solid rgba(47, 65, 81, 0.2);
@@ -138,7 +138,6 @@
     background: rgba(47, 65, 81, 0.1);
 }
 
-/* Status osiągnięcia */
 .success-status {
     color: #2ecc71;
     font-weight: 500;
@@ -149,7 +148,7 @@
     font-weight: 500;
 }
 
-/* Stan pusty */
+
 .empty-goals {
     text-align: center;
     padding: 40px 0;
@@ -161,7 +160,7 @@
     margin-bottom: 20px;
 }
 
-/* Responsywność */
+
 @media (max-width: 1024px) {
     .archive-container {
         margin-left: 0;

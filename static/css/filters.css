@@ -1,10 +1,10 @@
-/* Layout główny */
+
 .layout {
     display: flex;
     min-height: 100vh;
 }
 
-/* Sidebar */
+
 .sidebar {
     position: fixed;
     width: 260px;
@@ -81,7 +81,7 @@
     gap: 8px;
 }
 
-/* Kontener filtrów */
+
 .filters-container {
     flex: 1;
     display: flex;
@@ -118,7 +118,7 @@
     opacity: 0.8;
 }
 
-/* Formularz filtrów */
+
 .filters-form {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -152,7 +152,7 @@
     box-shadow: 0 0 0 2px rgba(47, 65, 81, 0.1);
 }
 
-/* Przyciski akcji */
+
 .filters-actions {
     grid-column: 1 / -1;
     display: flex;
@@ -194,7 +194,7 @@
     background: rgba(47, 65, 81, 0.1);
 }
 
-/* Lista wydatków */
+
 .expense-list {
     margin-top: 30px;
 }
@@ -240,7 +240,7 @@
     opacity: 0.8;
 }
 
-/* Responsywność */
+
 @media (max-width: 1024px) {
     .filters-container {
         margin-left: 0;

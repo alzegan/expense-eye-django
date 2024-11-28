@@ -1,10 +1,8 @@
-/* Layout */
 .layout {
     display: flex;
     min-height: 100vh;
 }
 
-/* Sidebar */
 .sidebar {
     position: fixed;
     width: 260px;
@@ -74,21 +72,18 @@
     height: 20px;
 }
 
-/* Main Content */
 .main-content {
     flex: 1;
     padding: 24px;
     margin-left: 260px;
 }
 
-/* Dashboard */
 .dashboard {
     padding: 20px;
     max-width: 1200px;
     margin: 0 auto;
 }
 
-/* Dashboard Grid */
 .dashboard-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -97,7 +92,7 @@
     margin-bottom: 30px;
 }
 
-/* Dashboard Cards */
+
 .dashboard-card {
     background: rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(10px);
@@ -135,7 +130,6 @@
     grid-column: 1 / -1;
 }
 
-/* Summary Card */
 .amount {
     font-size: 36px;
     font-weight: 600;
@@ -143,7 +137,6 @@
     margin-top: 10px;
 }
 
-/* Expenses List */
 .expense-item {
     display: flex;
     justify-content: space-between;
@@ -172,7 +165,6 @@
     font-weight: 600;
 }
 
-/* Categories */
 .category-expenses {
     display: flex;
     flex-direction: column;
@@ -203,7 +195,6 @@
     font-weight: 600;
 }
 
-/* Goals Widget */
 .goals-widget-header {
     display: flex;
     justify-content: space-between;
@@ -336,7 +327,6 @@
     text-decoration: underline;
 }
 
-/* Dashboard Actions */
 .dashboard-actions {
     display: flex;
     gap: 15px;
@@ -370,7 +360,7 @@
     opacity: 0.8;
 }
 
-/* Responsiveness */
+
 @media (max-width: 1024px) {
     .dashboard-grid {
         grid-template-columns: 1fr;
